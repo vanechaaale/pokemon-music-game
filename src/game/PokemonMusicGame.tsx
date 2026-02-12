@@ -7,11 +7,9 @@ import { useState, useEffect, useCallback } from "react";
 import { GameDetails } from "./GameDetails";
 import { socket } from "../util/utils";
 import { notifications } from "@mantine/notifications";
-import { useDisclosure } from "@mantine/hooks";
 
 export function PokemonMusicGame() {
   const { lobbyId } = useParams<{ lobbyId: string }>();
-  const [navOpened, { toggle }] = useDisclosure();
   const [gameSettings, setGameSettings] = useState<GameSettings | null>(null);
   const currentPlayer =
     gameSettings?.players.find((p) => p.socketId === socket.id) || null;
@@ -49,7 +47,7 @@ export function PokemonMusicGame() {
   }, [lobbyId]);
 
   useEffect(() => {
-    // listen for error messages    
+    // listen for error messages
     const handleErrorMessage = (message: string) => {
       notifications.show({
         title: "Error",
@@ -70,11 +68,11 @@ export function PokemonMusicGame() {
   return (
     <AppShell
       header={{ height: "10%" }}
-      navbar={{ 
-        width: "20%", 
+      navbar={{
+        width: "20%",
         collapsed: { mobile: true },
         breakpoint: "sm",
-       }}
+      }}
       padding="md"
     >
       <Header />
@@ -96,10 +94,15 @@ export function PokemonMusicGame() {
             onStartGame={startGame}
           />
         ) : (
-          <Box style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
-            <img
-               src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExMXpuNGk0MHppc3R4eTY3NTZvejN0enN6aGpmbnZ1YjZybWNybm55ciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ng88DijbQOzq8nPJmv/giphy.gif"
-            />
+          <Box
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              textAlign: "center",
+            }}
+          >
+            <img src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExMXpuNGk0MHppc3R4eTY3NTZvejN0enN6aGpmbnZ1YjZybWNybm55ciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ng88DijbQOzq8nPJmv/giphy.gif" />
             Waiting for host to start ...
           </Box>
         )}

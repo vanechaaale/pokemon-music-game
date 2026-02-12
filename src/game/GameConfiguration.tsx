@@ -96,15 +96,17 @@ export function GameConfiguration({
   ]);
   return (
     !started && (
-      <Paper shadow="sm" p="lg" radius="md" withBorder >
+      <Paper shadow="sm" p="lg" radius="md" withBorder>
         <Title order={3} mb="md">
           Game Configuration
         </Title>
-        <Text mb="md">
-          Lobby ID: {settings?.code || "N/A"}
-        </Text>
+        <Text mb="md">Lobby ID: {settings?.code || "N/A"}</Text>
         <Stack
-          style={{ alignItems: "center", justifyContent: "center", flexDirection: "row" }}
+          style={{
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "row",
+          }}
           gap="xl"
         >
           <Box
@@ -116,7 +118,7 @@ export function GameConfiguration({
               alignItems: "center",
             }}
           >
-            <Box style={{ marginBottom: "1rem", width: '100%' }}>
+            <Box style={{ marginBottom: "1rem", width: "100%" }}>
               <Text fw={500} mb="xs">
                 Difficulty
               </Text>
@@ -133,7 +135,9 @@ export function GameConfiguration({
                 fullWidth
               />
             </Box>
-            <Box style={{ width: '50%', overflow: 'hidden', marginBottom: '1rem' }}>
+            <Box
+              style={{ width: "50%", overflow: "hidden", marginBottom: "1rem" }}
+            >
               <Text fw={500} mb="xs">
                 Rounds
               </Text>
@@ -166,7 +170,13 @@ export function GameConfiguration({
             </Box>
           </Box>
 
-          <Box style={{display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <Box
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
             <Text mb="xs">Music Selection</Text>
             <MultiSelect
               value={musicSources}
@@ -182,7 +192,9 @@ export function GameConfiguration({
               clearable
               style={{ width: "100%" }}
             />
-            <Text mb="xs" style={{ marginTop: "1rem" }}>Filters</Text>
+            <Text mb="xs" style={{ marginTop: "1rem" }}>
+              Filters
+            </Text>
             <MultiSelect
               value={songTypes}
               onChange={(value) => setSongTypes(value as SongType[])}
@@ -194,9 +206,9 @@ export function GameConfiguration({
           </Box>
         </Stack>
 
-          <Button onClick={startGame} mt="xl" size="md">
-            Start Game
-          </Button>
+        <Button onClick={startGame} mt="xl" size="md">
+          Start Game
+        </Button>
       </Paper>
     )
   );

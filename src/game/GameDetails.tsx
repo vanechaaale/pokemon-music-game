@@ -1,10 +1,4 @@
-import {
-  Box,
-  Grid,
-  Popover,
-  Text,
-  TextInput,
-} from "@mantine/core";
+import { Box, Grid, Popover, Text, TextInput } from "@mantine/core";
 import type { GameSettings, Player } from "./GameConfiguration";
 import { socket } from "../util/utils";
 import { useMemo } from "react";
@@ -33,13 +27,9 @@ export function GameDetails({ lobbyId, settings }: GameDetailsProps) {
 
   return (
     <Box p="md">
-      <Text size="sm">
-        Lobby ID: {lobbyId}
-      </Text>
+      <Text size="sm">Lobby ID: {lobbyId}</Text>
       <Box style={{ marginTop: "1rem" }}>
-        <Text size="lg">
-          Players:
-        </Text>
+        <Text size="lg">Players:</Text>
         {settings?.players?.map((player, index) => (
           <Box
             style={{
@@ -162,7 +152,7 @@ export function GameDetails({ lobbyId, settings }: GameDetailsProps) {
         )) || <Text>No players joined yet</Text>}
       </Box>
     </Box>
-    );
+  );
 }
 
 export default GameDetails;

@@ -16,8 +16,7 @@ function formatSongName(song: SongOption): string {
 }
 
 export default function SongMultipleChoice(props: SongMultipleChoiceProps) {
-  const { options, answered, handleAnswer } =
-    props;
+  const { options, answered, handleAnswer } = props;
   return (
     <Stack gap="sm">
       {options.map((option) => {
