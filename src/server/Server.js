@@ -11,7 +11,8 @@ const io = new Server(server, {
   cors: {
     origin: [
       "http://localhost:5173",
-      "https://pokemon-music-quiz.vercel.app",  // Your Vercel URL
+      // "https://pokemon-music-quiz.vercel.app",  // Your Vercel URL
+      "https://pokemon-music-game-boyz8kjrv-vanechaaales-projects.vercel.app/"
       // Add custom domain later if you get one:
       // "https://pokemonmusicquiz.com",
     ],
