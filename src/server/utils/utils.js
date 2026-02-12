@@ -22,11 +22,11 @@ export function shuffleArray(array) {
 
 export function loadSongs(musicSources, songTypes) {
   const fileMap = {
-    ///Users/vle/personal-project/pokemon-music-quiz/public/red_blue.json
     red_blue: "../../public/red_blue.json",
     gold_silver: "../../public/gold_silver.json",
     ruby_sapphire: "../../public/ruby_sapphire.json",
     firered_leafgreen: "../../public/firered_leafgreen.json",
+    diamond_pearl: "../../public/diamond_pearl.json",
     theme_songs: "../../public/theme_songs.json",
   };
 

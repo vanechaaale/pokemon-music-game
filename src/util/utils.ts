@@ -6,9 +6,10 @@ export const MusicSource = {
   GoldSilver: 'Gold/Silver',
   RubySapphire: 'Ruby/Sapphire',
   FireRedLeafGreen: 'FireRed/LeafGreen',
+  DiamondPearl: 'Diamond/Pearl',
   ThemeSongs: 'Theme Songs',
 }
-export type MusicSource = 'red_blue' | 'gold_silver' | 'theme_songs' | 'ruby_sapphire' | 'firered_leafgreen';
+export type MusicSource = 'red_blue' | 'gold_silver' | 'theme_songs' | 'ruby_sapphire' | 'firered_leafgreen' | 'diamond_pearl';
 
 
 export const SongType = {
