@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import Header from "./Header";
 import { useEffect, useState } from "react";
 import { socket } from "./util/utils";
+import { notifications } from '@mantine/notifications';
+import '@mantine/notifications/styles.css';
 
 export function Home() {
   const navigate = useNavigate();
@@ -22,7 +24,6 @@ export function Home() {
 
     // Listen for gameCreated event
     socket.on("gameCreated", (game) => {
-      console.log("gameCreated received:", game);
       navigate(`/lobby/${game.code}`);
     });
 
@@ -46,8 +47,18 @@ export function Home() {
   const handleJoinLobby = () => {
     if (gameCode.trim()) {
       const code = gameCode.trim().toUpperCase();
-      socket.emit("joinGame", { code, name: `Player-${socket.id?.slice(-4)}` });
-      navigate(`/lobby/${code}`);
+      socket.emit("joinGame", { code, name: `Player-${socket.id?.slice(-4)}` }).on("joinSuccess", (game) => {
+        navigate(`/lobby/${game.code}`);
+      }).on("errorMessage", (message) => {
+        console.log("error:", message);
+        notifications.show({
+          title: 'Error Joining Lobby',
+          message: message,
+          position: 'bottom-center',
+          autoClose: 1000,
+          color: 'red',
+        });
+      });
     }
   };
 

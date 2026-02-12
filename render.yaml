@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: pokemon-music-quiz-server
+    env: node
+    buildCommand: npm install
+    startCommand: node src/server/Server.js
+    envVars:
+      - key: NODE_ENV
+        value: production

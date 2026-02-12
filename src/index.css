@@ -65,4 +65,8 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+  .hover-outline:hover {
+  outline: 5px solid gray;
+  outline-offset: 3px;
+}
 }

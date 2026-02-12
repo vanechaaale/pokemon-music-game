@@ -73,7 +73,6 @@ export function MusicContainer(props: MusicContainerProps) {
 
   // Answer state
   const [answered, setAnswered] = useState(false);
-  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [isCorrect, setIsCorrect] = useState(false);
   const [correctAnswer, setCorrectAnswer] = useState<{
     title: string;
@@ -114,7 +113,6 @@ export function MusicContainer(props: MusicContainerProps) {
       setDifficulty(data.difficulty);
       setTimeRemaining(data.duration);
       setAnswered(false);
-      setSelectedAnswer(null);
       setCorrectAnswer(null);
       setBetweenRounds(false);
       setVideoKey((k) => k + 1);
@@ -154,13 +152,16 @@ export function MusicContainer(props: MusicContainerProps) {
     socket.on("gameOver", handleGameOver);
     socket.on("answerReceived", handleAnswerReceived);
 
+    // Request current round state in case we missed roundStart
+    socket.emit("getCurrentRound", settings.code);
+
     return () => {
       socket.off("roundStart", handleRoundStart);
       socket.off("roundEnd", handleRoundEnd);
       socket.off("gameOver", handleGameOver);
       socket.off("answerReceived", handleAnswerReceived);
     };
-  }, [settings.players]);
+  }, [settings.players, settings.code]);
 
   // Client-side timer for UI display (server is authoritative)
   useEffect(() => {
@@ -200,7 +201,6 @@ export function MusicContainer(props: MusicContainerProps) {
   const handleAnswer = (answer: string | undefined) => {
     if (answered) return;
 
-    setSelectedAnswer(answer ?? null);
     socket.emit("submitAnswer", {
       code: settings.code,
       answer: answer ?? null,
@@ -218,10 +218,9 @@ export function MusicContainer(props: MusicContainerProps) {
   return (
     <Paper shadow="sm" p="lg" radius="md" withBorder>
       <Group justify="space-between" mb="md">
-        <Title order={3}>
+        <Title order={3} style={{ width: "100%" }}>
           Round {currentRound} / {totalRounds}
         </Title>
-        <Text fw={500}>Score: {myScore}</Text>
       </Group>
 
       {isGameOver ? (
@@ -303,7 +302,7 @@ export function MusicContainer(props: MusicContainerProps) {
         )}
 
         {/* Answer Section */}
-        {!answered && !isGameOver && (
+        {!answered && !isGameOver && !betweenRounds && (
           <Paper p="md" withBorder>
             <Text fw={500} mb="sm">
               What song is this?
@@ -312,8 +311,6 @@ export function MusicContainer(props: MusicContainerProps) {
               <SongMultipleChoice
                 options={multiChoiceOptions}
                 answered={answered}
-                correctAnswer={correctAnswer}
-                selectedAnswer={selectedAnswer}
                 handleAnswer={handleAnswer}
               />
             ) : (
@@ -324,7 +321,6 @@ export function MusicContainer(props: MusicContainerProps) {
                 songs={songsList}
                 disabled={answered}
               />
-              // <Text c="dimmed">Hard mode autocomplete coming soon...</Text>
             )}
           </Paper>
         )}

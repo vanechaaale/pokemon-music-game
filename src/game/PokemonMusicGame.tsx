@@ -1,4 +1,4 @@
-import { AppShell } from "@mantine/core";
+import { AppShell, Box } from "@mantine/core";
 import { useParams } from "react-router-dom";
 import Header from "../Header";
 import GameConfiguration, { type GameSettings } from "./GameConfiguration";
@@ -6,9 +6,12 @@ import MusicContainer from "./MusicContainer";
 import { useState, useEffect, useCallback } from "react";
 import { GameDetails } from "./GameDetails";
 import { socket } from "../util/utils";
+import { notifications } from "@mantine/notifications";
+import { useDisclosure } from "@mantine/hooks";
 
 export function PokemonMusicGame() {
   const { lobbyId } = useParams<{ lobbyId: string }>();
+  const [navOpened, { toggle }] = useDisclosure();
   const [gameSettings, setGameSettings] = useState<GameSettings | null>(null);
   const currentPlayer =
     gameSettings?.players.find((p) => p.socketId === socket.id) || null;
@@ -39,18 +42,39 @@ export function PokemonMusicGame() {
       socket.emit("getLobbyState", lobbyId);
     }
 
-    // Cleanup: remove listeners when component unmounts or lobbyId changes
-    // This prevents duplicate listeners from accumulating
     return () => {
       socket.off("lobbyUpdate", handleLobbyUpdate);
       socket.off("gameStarted", handleGameStarted);
     };
   }, [lobbyId]);
 
+  useEffect(() => {
+    // listen for error messages    
+    const handleErrorMessage = (message: string) => {
+      notifications.show({
+        title: "Error",
+        message,
+        position: "bottom-center",
+        autoClose: 3000,
+        color: "red",
+      });
+    };
+
+    socket.on("errorMessage", handleErrorMessage);
+
+    return () => {
+      socket.off("errorMessage", handleErrorMessage);
+    };
+  }, []);
+
   return (
     <AppShell
-      header={{ height: 60 }}
-      navbar={{ width: 300, breakpoint: "sm" }}
+      header={{ height: "10%" }}
+      navbar={{ 
+        width: "20%", 
+        collapsed: { mobile: true },
+        breakpoint: "sm",
+       }}
       padding="md"
     >
       <Header />
@@ -62,7 +86,7 @@ export function PokemonMusicGame() {
           isHost={isHost}
         />
       </AppShell.Navbar>
-      <AppShell.Main>
+      <AppShell.Main style={{ width: "100%" }}>
         {gameSettings?.started ? (
           <MusicContainer settings={gameSettings} />
         ) : isHost ? (
@@ -72,7 +96,12 @@ export function PokemonMusicGame() {
             onStartGame={startGame}
           />
         ) : (
-          <>Waiting for host to start ...</>
+          <Box style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
+            <img
+               src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExMXpuNGk0MHppc3R4eTY3NTZvejN0enN6aGpmbnZ1YjZybWNybm55ciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ng88DijbQOzq8nPJmv/giphy.gif"
+            />
+            Waiting for host to start ...
+          </Box>
         )}
       </AppShell.Main>
     </AppShell>

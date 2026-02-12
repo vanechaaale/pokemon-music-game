@@ -3,15 +3,25 @@ import http from "http";
 import { Server } from "socket.io";
 import { v4 as uuidv4 } from "uuid";
 import { generateCode, shuffleArray, loadSongs } from "./utils/utils.js";
-
+const PORT = process.env.PORT || 3001;
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
-  cors: { origin: "*" }
+  cors: {
+    origin: [
+      "http://localhost:5173",
+      "https://pokemon-music-quiz.vercel.app",  // Your Vercel URL
+      // Add custom domain later if you get one:
+      // "https://pokemonmusicquiz.com",
+    ],
+    methods: ["GET", "POST"],
+  },
 });
 
-server.listen(3001);
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 
 const games = new Map();
 const TIME_BETWEEN_ROUNDS = 8;
@@ -53,6 +63,10 @@ function startRound(game) {
     game: s.game,
   }));
 
+  // Store on game object for getCurrentRound to access
+  game.currentOptions = options;
+  game.currentSongList = songList;
+
   // Emit round start - hide the correct song's title by only sending link
   io.to(game.code).emit("roundStart", {
     round: game.round,
@@ -67,6 +81,7 @@ function startRound(game) {
     songList,
     duration: game.levelDuration,
     difficulty: game.difficulty,
+    code: game.code,
   });
 
   // Set round timer
@@ -138,14 +153,24 @@ function endGame(game) {
 // Host creates a game
 io.on("connection", (socket) => {
   socket.on("createGame", () => {
+    // Clean up any existing games this socket is hosting
+    for (const [code, existingGame] of games.entries()) {
+      if (existingGame.hostSocketId === socket.id) {
+        if (existingGame.roundTimer) clearTimeout(existingGame.roundTimer);
+        if (existingGame.reviewTimer) clearTimeout(existingGame.reviewTimer);
+        games.delete(code);
+      }
+    }
+
     const code = generateCode();
+    const iconIdx = Math.floor(Math.random() * 151) + 1;
 
     const game = {
       difficulty: "normal",
-      levelDuration: 20,
+      levelDuration: null,
       songTypes: [],
       musicSources: [],
-      numberOfRounds: 5,
+      numberOfRounds: null,
       started: false,
       code,
       hostSocketId: socket.id,
@@ -153,6 +178,7 @@ io.on("connection", (socket) => {
           {
               id: uuidv4(),
               name: "Host",
+              icon: `https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/portrait/${String(iconIdx).padStart(4, '0')}/Normal.png`,
               score: 0,
               socketId: socket.id
           }
@@ -181,18 +207,34 @@ io.on("connection", (socket) => {
     if (game.players.some(p => p.socketId === socket.id)) {
       return;
     }
+    const iconIdx = Math.floor(Math.random() * 1000) + 1;
 
     const player = {
       id: uuidv4(),
       name,
+      icon: `https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/portrait/${String(iconIdx).padStart(4, '0')}/Normal.png`,
       score: 0,
       socketId: socket.id
     };
 
     game.players.push(player);
+    socket.emit("joinSuccess", game);
     socket.join(code);
     
     io.to(code).emit("lobbyUpdate", game);
+  });
+
+  socket.on("playerEdit", ({ code, player }) => {
+    const game = games.get(code);
+    if (!game) {
+      socket.emit("errorMessage", "Game not found");
+      return;
+    }
+    const existingPlayerIndex = game.players.findIndex(p => p.socketId === player.socketId);
+    if (existingPlayerIndex !== -1) {
+      game.players[existingPlayerIndex] = player;
+      io.to(code).emit("lobbyUpdate", game);
+    }
   });
 
   // Client requests current lobby state on mount
@@ -203,6 +245,27 @@ io.on("connection", (socket) => {
       socket.emit("lobbyUpdate", game);
     } else {
       socket.emit("errorMessage", "Lobby not found");
+    }
+  });
+
+  // Client requests current round state (in case they missed roundStart)
+  socket.on("getCurrentRound", (code) => {
+    const game = games.get(code);
+    if (game && game.phase === "IN_PROGRESS" && game.currentSong) {
+      socket.emit("roundStart", {
+        round: game.round,
+        totalRounds: game.numberOfRounds,
+        song: {
+          link: game.currentSong.link,
+          type: game.currentSong.type,
+          game: game.currentSong.game,
+        },
+        options: game.currentOptions || [],
+        songList: game.currentSongList || [],
+        duration: game.levelDuration,
+        difficulty: game.difficulty,
+        code: game.code,
+      });
     }
   });
 
@@ -219,7 +282,6 @@ io.on("connection", (socket) => {
       return;
     }
 
-    debugger;
     // Apply settings
     game.difficulty = settings.difficulty;
     game.levelDuration = settings.levelDuration;
@@ -237,6 +299,10 @@ io.on("connection", (socket) => {
 
     if (game.songs.length === 0) {
       socket.emit("errorMessage", "No songs found for selected categories");
+      return;
+    }
+    if (game.songs.length < game.numberOfRounds) {
+      socket.emit("errorMessage", `Not enough songs (${game.songs.length}) for selected number of rounds (${game.numberOfRounds})`);
       return;
     }
 
@@ -276,8 +342,19 @@ io.on("connection", (socket) => {
       (p) => game.playerAnswers[p.socketId] !== undefined
     );
 
-    if (allAnswered) {
+    if (allAnswered && game.phase === "IN_PROGRESS") {
       endRound(game);
+    }
+  });
+
+  // Clean up games when host disconnects
+  socket.on("disconnect", () => {
+    for (const [code, game] of games.entries()) {
+      if (game.hostSocketId === socket.id) {
+        if (game.roundTimer) clearTimeout(game.roundTimer);
+        if (game.reviewTimer) clearTimeout(game.reviewTimer);
+        games.delete(code);
+      }
     }
   });
 });

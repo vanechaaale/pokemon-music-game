@@ -16,6 +16,7 @@ import type { MusicSource, SongType } from "../util/utils";
 export interface Player {
   id: string;
   name: string;
+  icon: string;
   score: number;
   socketId: string;
 }
@@ -24,6 +25,7 @@ export interface GameSettings {
   code: string;
   players: Player[];
   hostSocketId: string;
+  songs: { link: string; type: string; game: string }[];
   phase: "LOBBY" | "IN_PROGRESS" | "REVIEW" | "GAME_OVER";
   round: number;
   difficulty: "easy" | "normal" | "hard";
@@ -41,12 +43,11 @@ interface GameConfigurationProps {
 }
 
 const SONG_TYPE_OPTIONS = [
-  { value: "location", label: "Location" },
-  { value: "route", label: "Route" },
   { value: "battle_theme", label: "Battle" },
+  { value: "location", label: "City/Town/Cave" },
+  { value: "route", label: "Route/Path" },
   { value: "action", label: "Action (Biking/Surfing)" },
-  { value: "theme_song", label: "Theme" },
-  { value: "event", label: "Event" },
+  { value: "theme", label: "Theme" },
 ];
 
 export function GameConfiguration({
@@ -59,14 +60,16 @@ export function GameConfiguration({
   );
   const [levelDuration, setLevelDuration] = useState(20);
   const [songTypes, setSongTypes] = useState<SongType[]>([
+    "battle_theme",
     "location",
     "route",
-    "battle_theme",
+    "action",
+    "theme",
   ]);
   const [musicSources, setMusicSources] = useState<MusicSource[]>([
     "red_blue",
     "gold_silver",
-    "theme_songs",
+    "ruby_sapphire",
   ]);
   const [numberOfRounds, setNumberOfRounds] = useState(10);
 
@@ -93,97 +96,107 @@ export function GameConfiguration({
   ]);
   return (
     !started && (
-      <Paper shadow="sm" p="lg" radius="md" withBorder>
+      <Paper shadow="sm" p="lg" radius="md" withBorder >
         <Title order={3} mb="md">
           Game Configuration
         </Title>
-
-        <Stack gap="xl">
-          {/* Difficulty */}
-          <Box style={{ width: "100%" }}>
-            <Text fw={500} mb="xs">
-              Difficulty
-            </Text>
-            <SegmentedControl
-              value={difficulty}
-              onChange={(value) =>
-                setDifficulty(value as "easy" | "normal" | "hard")
-              }
-              data={[
-                { label: "Easy", value: "easy" },
-                { label: "Normal", value: "normal" },
-                { label: "Hard", value: "hard" },
-              ]}
-              fullWidth
-            />
+        <Text mb="md">
+          Lobby ID: {settings?.code || "N/A"}
+        </Text>
+        <Stack
+          style={{ alignItems: "center", justifyContent: "center", flexDirection: "row" }}
+          gap="xl"
+        >
+          <Box
+            style={{
+              width: "50%",
+              display: "flex",
+              gap: "1rem",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <Box style={{ marginBottom: "1rem", width: '100%' }}>
+              <Text fw={500} mb="xs">
+                Difficulty
+              </Text>
+              <SegmentedControl
+                value={difficulty}
+                onChange={(value) =>
+                  setDifficulty(value as "easy" | "normal" | "hard")
+                }
+                data={[
+                  { label: "Easy", value: "easy" },
+                  { label: "Normal", value: "normal" },
+                  { label: "Hard", value: "hard" },
+                ]}
+                fullWidth
+              />
+            </Box>
+            <Box style={{ width: '50%', overflow: 'hidden', marginBottom: '1rem' }}>
+              <Text fw={500} mb="xs">
+                Rounds
+              </Text>
+              <NumberInput
+                value={numberOfRounds}
+                onChange={(value) =>
+                  setNumberOfRounds(typeof value === "number" ? value : 1)
+                }
+                min={1}
+                max={50}
+                step={1}
+              />
+            </Box>
+            <Box>
+              <Text fw={500} mb="xs">
+                Round Duration: {levelDuration} seconds
+              </Text>
+              <Slider
+                value={levelDuration}
+                onChange={setLevelDuration}
+                min={10}
+                max={30}
+                step={1}
+                marks={[
+                  { value: 10, label: "10s" },
+                  { value: 20, label: "20s" },
+                  { value: 30, label: "30s" },
+                ]}
+              />
+            </Box>
           </Box>
 
-          {/* Number of Rounds */}
-          <Box>
-            <Text fw={500} mb="xs">
-              Number of Rounds
-            </Text>
-            <NumberInput
-              value={numberOfRounds}
-              onChange={(value) =>
-                setNumberOfRounds(typeof value === "number" ? value : 10)
-              }
-              min={1}
-              max={50}
-              step={1}
-            />
-          </Box>
-
-          {/* Round Duration */}
-          <Box style={{ width: "100%" }}>
-            <Text fw={500} mb="xs">
-              Round Duration: {levelDuration} seconds
-            </Text>
-            <Slider
-              value={levelDuration}
-              onChange={setLevelDuration}
-              min={10}
-              max={30}
-              step={1}
-              marks={[
-                { value: 10, label: "10s" },
-                { value: 20, label: "20s" },
-                { value: 30, label: "30s" },
-              ]}
-            />
-          </Box>
-
-          {/* Song Types */}
-          <Box>
-            <Text mb="xs">Song Types</Text>
-            <MultiSelect
-              value={songTypes}
-              onChange={(value) => setSongTypes(value as SongType[])}
-              data={SONG_TYPE_OPTIONS}
-              placeholder="Select categories"
-              clearable
-            />
-          </Box>
-
-          {/* Music Sources */}
-          <Box>
-            <Text mb="xs">Music Sources</Text>
+          <Box style={{display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Text mb="xs">Music Selection</Text>
             <MultiSelect
               value={musicSources}
               onChange={(value) => setMusicSources(value as MusicSource[])}
               data={[
                 { value: "red_blue", label: "Red/Blue" },
                 { value: "gold_silver", label: "Gold/Silver" },
-                { value: "theme_songs", label: "Theme Songs" },
+                { value: "theme_songs", label: "Anime" },
+                { value: "ruby_sapphire", label: "Ruby/Sapphire" },
+                { value: "firered_leafgreen", label: "FireRed/LeafGreen" },
               ]}
               placeholder="Select music sources"
               clearable
+              style={{ width: "100%" }}
+            />
+            <Text mb="xs" style={{ marginTop: "1rem" }}>Filters</Text>
+            <MultiSelect
+              value={songTypes}
+              onChange={(value) => setSongTypes(value as SongType[])}
+              data={SONG_TYPE_OPTIONS}
+              placeholder="Select filters"
+              clearable
+              style={{ width: "100%" }}
             />
           </Box>
-          <Button onClick={startGame} fullWidth mt="xl" size="md">
+        </Stack>
+
+          <Button onClick={startGame} mt="xl" size="md">
             Start Game
           </Button>
-        </Stack>
       </Paper>
     )
   );

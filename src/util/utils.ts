@@ -1,13 +1,14 @@
 import { io } from "socket.io-client";
-
-export const socket = io("http://localhost:3001");
+export const socket = io(import.meta.env.VITE_SOCKET_URL || "http://localhost:3001");
 
 export const MusicSource = {
   RedBlue: 'Red/Blue',
   GoldSilver: 'Gold/Silver',
+  RubySapphire: 'Ruby/Sapphire',
+  FireRedLeafGreen: 'FireRed/LeafGreen',
   ThemeSongs: 'Theme Songs',
 }
-export type MusicSource = 'red_blue' | 'gold_silver' | 'theme_songs';
+export type MusicSource = 'red_blue' | 'gold_silver' | 'theme_songs' | 'ruby_sapphire' | 'firered_leafgreen';
 
 
 export const SongType = {
@@ -15,7 +16,7 @@ export const SongType = {
   Route: 'route',
   Battle: 'battle_theme',
   Action: 'action',
-  Theme: 'theme_song',
+  Theme: 'theme',
   Event: 'event',
 } as const;
 

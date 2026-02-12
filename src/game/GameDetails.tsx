@@ -1,6 +1,14 @@
-import { Box, Text } from "@mantine/core";
+import {
+  Box,
+  Grid,
+  Popover,
+  Text,
+  TextInput,
+} from "@mantine/core";
 import type { GameSettings, Player } from "./GameConfiguration";
 import { socket } from "../util/utils";
+import { useMemo } from "react";
+import { useDisclosure } from "@mantine/hooks";
 
 interface GameDetailsProps {
   lobbyId: string;
@@ -10,33 +18,151 @@ interface GameDetailsProps {
 }
 
 export function GameDetails({ lobbyId, settings }: GameDetailsProps) {
-  console.log("players:", settings?.players);
+  const [playerIconOpen, { close, toggle }] = useDisclosure(false);
+
+  const iconOptions = useMemo(() => {
+    const icons = [];
+    for (let i = 1; i <= 151; i++) {
+      icons.push({
+        label: `Icon ${i}`,
+        value: `https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/portrait/${String(i).padStart(4, "0")}/Normal.png`,
+      });
+    }
+    return icons;
+  }, []);
+
   return (
     <Box p="md">
-      <Text size="sm" c="dimmed">
+      <Text size="sm">
         Lobby ID: {lobbyId}
       </Text>
       <Box style={{ marginTop: "1rem" }}>
-        <Text c="dimmed" size="lg">
+        <Text size="lg">
           Players:
         </Text>
         {settings?.players?.map((player, index) => (
-          <Text
-            key={player.id || index}
-            c={player.socketId === socket.id ? "blue" : "black"}
+          <Box
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              gap: "1rem",
+              marginBottom: "0.5rem",
+            }}
           >
-            {player.name}
-          </Text>
+            <Popover
+              opened={
+                playerIconOpen &&
+                !settings.started &&
+                player.socketId === socket.id
+              }
+              onClose={close}
+              onDismiss={close}
+              position="right-start"
+              withArrow
+              shadow="md"
+              width="50vh"
+            >
+              <Popover.Target>
+                <img
+                  onClick={() => {
+                    if (!settings.started && player.socketId === socket.id) {
+                      toggle();
+                    }
+                  }}
+                  key={player.id || index}
+                  src={player.icon}
+                  alt="Profile Icon"
+                  width={64}
+                  height={64}
+                  style={{
+                    display: "block",
+                    borderRadius: "50%",
+                    outline: "black solid 1px",
+                    cursor:
+                      player.socketId === socket.id ? "pointer" : "default",
+                  }}
+                  className={
+                    player.socketId === socket.id ? "hover-outline" : ""
+                  }
+                />
+              </Popover.Target>
+              <Popover.Dropdown>
+                <Text mb="sm" fw={500}>
+                  Change Icon:
+                </Text>
+                <Grid
+                  style={{ overflowY: "scroll", maxHeight: "42vh", padding: 1 }}
+                >
+                  {iconOptions.map((option) => (
+                    <Grid.Col
+                      span={{ xs: 6, sm: 4, md: 3, lg: 2 }}
+                      key={option.value}
+                      style={{ display: "flex", justifyContent: "center" }}
+                    >
+                      <img
+                        key={option.value}
+                        src={option.value}
+                        alt={option.label}
+                        width={48}
+                        height={48}
+                        style={{
+                          cursor: "pointer",
+                          borderRadius: "50%",
+                          outline: "black solid 1px",
+                        }}
+                        className="hover-outline"
+                        onClick={() => {
+                          socket.emit("playerEdit", {
+                            code: lobbyId,
+                            player: {
+                              ...player,
+                              icon: option.value,
+                            },
+                          });
+                          close();
+                        }}
+                      />
+                    </Grid.Col>
+                  ))}
+                </Grid>
+              </Popover.Dropdown>
+            </Popover>
+
+            {player.socketId === socket.id && !settings.started ? (
+              <>
+                <TextInput
+                  key={player.id || index}
+                  value={player.name}
+                  onChange={(e) => {
+                    const newName = e.currentTarget.value;
+                    socket.emit("playerEdit", {
+                      code: lobbyId,
+                      player: {
+                        ...player,
+                        name: newName,
+                      },
+                    });
+                  }}
+                  placeholder="Enter your name"
+                  size="md"
+                />
+              </>
+            ) : (
+              <>
+                <Text
+                  key={player.id || index}
+                  c={player.socketId === socket.id ? "blue" : "black"}
+                >
+                  {player.name}
+                </Text>
+              </>
+            )}
+          </Box>
         )) || <Text>No players joined yet</Text>}
       </Box>
-      {settings?.started ? (
-        <Box style={{ marginTop: "1rem" }}>
-          <Text>Difficulty: {settings.difficulty}</Text>
-          <Text>Music Categories: {settings.songTypes.join(", ")}</Text>
-        </Box>
-      ) : (
-        <></>
-      )}
     </Box>
-  );
+    );
 }
+
+export default GameDetails;

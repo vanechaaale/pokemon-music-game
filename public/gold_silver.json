@@ -1,6 +1,6 @@
 [
-  { "game": "Pokemon Gold, Silver, and Crystal", "title": "Pokemon Gold/Silver Intro Opening Demo", "link": "https://www.youtube.com/watch?v=Uquvi61gm2E&t=0s", "type": "theme_song" },
-  { "game": "Pokemon Gold, Silver, and Crystal", "title": "Title Screen", "link": "https://www.youtube.com/watch?v=Uquvi61gm2E&t=43s", "type": "theme_song" },
+  { "game": "Pokemon Gold, Silver, and Crystal", "title": "Pokemon Gold/Silver Intro Opening Demo", "link": "https://www.youtube.com/watch?v=Uquvi61gm2E&t=0s", "type": "theme" },
+  { "game": "Pokemon Gold, Silver, and Crystal", "title": "Title Screen", "link": "https://www.youtube.com/watch?v=Uquvi61gm2E&t=43s", "type": "theme" },
   { "game": "Pokemon Gold, Silver, and Crystal", "title": "New Bark Town", "link": "https://www.youtube.com/watch?v=Uquvi61gm2E&t=180s", "type": "location" },
   { "game": "Pokemon Gold, Silver, and Crystal", "title": "Mom's Theme \"Hurry Along\"", "link": "https://www.youtube.com/watch?v=Uquvi61gm2E&t=261s", "type": "location" },
   { "game": "Pokemon Gold, Silver, and Crystal", "title": "Elm Pokemon Lab", "link": "https://www.youtube.com/watch?v=Uquvi61gm2E&t=276s", "type": "location" },
@@ -8,7 +8,7 @@
   { "game": "Pokemon Gold, Silver, and Crystal", "title": "Wild Pokemon Battle (Johto) (Day)", "link": "https://www.youtube.com/watch?v=Uquvi61gm2E&t=427s", "type": "battle_theme" },
   { "game": "Pokemon Gold, Silver, and Crystal", "title": "Cherrygrove City / Mahogany Town", "link": "https://www.youtube.com/watch?v=Uquvi61gm2E&t=551s", "type": "location" },
   { "game": "Pokemon Gold, Silver, and Crystal", "title": "Pokemon Center", "link": "https://www.youtube.com/watch?v=Uquvi61gm2E&t=660s", "type": "location" },
-  { "game": "Pokemon Gold, Silver, and Crystal", "title": "Professor Oak's Theme", "link": "https://www.youtube.com/watch?v=Uquvi61gm2E&t=731s", "type": "theme_song" },
+  { "game": "Pokemon Gold, Silver, and Crystal", "title": "Professor Oak's Theme", "link": "https://www.youtube.com/watch?v=Uquvi61gm2E&t=731s", "type": "theme" },
   { "game": "Pokemon Gold, Silver, and Crystal", "title": "Trainers' Eyes Meet - Youngster 1", "link": "https://www.youtube.com/watch?v=Uquvi61gm2E&t=775s", "type": "battle_theme" },
   { "game": "Pokemon Gold, Silver, and Crystal", "title": "Trainer Battle (Johto)", "link": "https://www.youtube.com/watch?v=Uquvi61gm2E&t=794s", "type": "battle_theme" },
   { "game": "Pokemon Gold, Silver, and Crystal", "title": "Route 30 / 31 / 32 / 33", "link": "https://www.youtube.com/watch?v=Uquvi61gm2E&t=1004s", "type": "route" },
@@ -48,7 +48,7 @@
   { "game": "Pokemon Gold, Silver, and Crystal", "title": "Victory Road", "link": "https://www.youtube.com/watch?v=Uquvi61gm2E&t=6492s", "type": "location" },
   { "game": "Pokemon Gold, Silver, and Crystal", "title": "Pokemon League (Indigo Plateau) / Mt Silver Exterior / Route 23", "link": "https://www.youtube.com/watch?v=Uquvi61gm2E&t=6532s", "type": "location" },
   { "game": "Pokemon Gold, Silver, and Crystal", "title": "Champion Battle (Lance / Red)", "link": "https://www.youtube.com/watch?v=Uquvi61gm2E&t=6596s", "type": "battle_theme" },
-  { "game": "Pokemon Gold, Silver, and Crystal", "title": "Entering the Hall of Fame", "link": "https://www.youtube.com/watch?v=Uquvi61gm2E&t=6711s", "type": "event" },
-  { "game": "Pokemon Gold, Silver, and Crystal", "title": "Credits Theme / Staff Roll", "link": "https://www.youtube.com/watch?v=Uquvi61gm2E&t=6770s", "type": "theme_song" },
-  { "game": "Pokemon Gold, Silver, and Crystal", "title": "The End", "link": "https://www.youtube.com/watch?v=Uquvi61gm2E&t=6889s", "type": "theme_song" }
+  { "game": "Pokemon Gold, Silver, and Crystal", "title": "Entering the Hall of Fame", "link": "https://www.youtube.com/watch?v=Uquvi61gm2E&t=6711s", "type": "theme" },
+  { "game": "Pokemon Gold, Silver, and Crystal", "title": "Credits Theme / Staff Roll", "link": "https://www.youtube.com/watch?v=Uquvi61gm2E&t=6770s", "type": "theme" },
+  { "game": "Pokemon Gold, Silver, and Crystal", "title": "The End", "link": "https://www.youtube.com/watch?v=Uquvi61gm2E&t=6889s", "type": "theme" }
 ]
