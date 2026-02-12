@@ -1,0 +1,96 @@
+import { AppShell, Box, Button, Paper, TextInput } from "@mantine/core";
+import { useNavigate } from "react-router-dom";
+import Header from "./Header";
+import { useEffect, useState } from "react";
+import { socket } from "./util/utils";
+
+export function Home() {
+  const navigate = useNavigate();
+  const [gameCode, setGameCode] = useState("");
+
+  useEffect(() => {
+    // Debug connection status
+    console.log("Socket connected:", socket.connected);
+
+    socket.on("connect", () => {
+      console.log("Socket connected successfully!");
+    });
+
+    socket.on("connect_error", (err) => {
+      console.error("Socket connection error:", err.message);
+    });
+
+    // Listen for gameCreated event
+    socket.on("gameCreated", (game) => {
+      console.log("gameCreated received:", game);
+      navigate(`/lobby/${game.code}`);
+    });
+
+    // Listen for error messages
+    socket.on("errorMessage", (message) => {
+      console.log("error:", message);
+    });
+
+    return () => {
+      socket.off("gameCreated");
+      socket.off("connect");
+      socket.off("connect_error");
+      socket.off("errorMessage");
+    };
+  }, [navigate]);
+
+  const createGame = () => {
+    socket.emit("createGame");
+  };
+
+  const handleJoinLobby = () => {
+    if (gameCode.trim()) {
+      const code = gameCode.trim().toUpperCase();
+      socket.emit("joinGame", { code, name: `Player-${socket.id?.slice(-4)}` });
+      navigate(`/lobby/${code}`);
+    }
+  };
+
+  return (
+    <>
+      <AppShell header={{ height: 60 }} padding="md">
+        <Header />
+        <AppShell.Main>
+          <h1>Welcome to Pokemon Music Quiz!</h1>
+          <p>
+            Test your knowledge of Pokemon music across all generations. Can you
+            name the song from just a few seconds of music?
+          </p>
+          <Box
+            style={{
+              display: "flex",
+              gap: "1rem",
+              marginTop: "2rem",
+              justifyContent: "center",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <Paper p="md" withBorder>
+              <TextInput
+                label="Lobby ID"
+                placeholder="Enter Lobby ID (e.g. ABCD)"
+                value={gameCode}
+                onChange={(e) => setGameCode(e.currentTarget.value)}
+                style={{ marginBottom: "1rem" }}
+              />
+              <Button
+                onClick={handleJoinLobby}
+                disabled={!gameCode.trim()}
+                style={{ marginRight: "1rem" }}
+              >
+                Join Lobby
+              </Button>
+              <Button onClick={createGame}>New Lobby</Button>
+            </Paper>
+          </Box>
+        </AppShell.Main>
+      </AppShell>
+    </>
+  );
+}
