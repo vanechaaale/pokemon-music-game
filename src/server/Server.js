@@ -11,12 +11,7 @@ const io = new Server(server, {
   cors: {
     origin: [
       "http://localhost:5173",
-      // "https://pokemon-music-quiz.vercel.app",  // Your Vercel URL
-      "https://pokemon-music-game-git-main-vanechaaales-projects.vercel.app",
-      "https://pokemon-music-game-boyz8kjrv-vanechaaales-projects.vercel.app",
       "https://pokemon-music-quiz.vercel.app",
-      // Add custom domain later if you get one:
-      // "https://pokemonmusicquiz.com",
     ],
     methods: ["GET", "POST"],
   },
@@ -105,12 +100,13 @@ function endRound(game) {
   // Calculate results for each player
   const results = game.players.map((player) => {
     const answer = game.playerAnswers[player.socketId];
-    const wasCorrect = answer === game.currentSong.title;
+    const wasCorrect = answer === `${game.currentSong.game}: ${game.currentSong.title}`;
     return {
       playerId: player.id,
       name: player.name,
       score: player.score,
       wasCorrect,
+      volume: player.volume,
       answer: answer || null,
     };
   });
@@ -183,6 +179,7 @@ io.on("connection", (socket) => {
               name: "Host",
               icon: `https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/portrait/${String(iconIdx).padStart(4, '0')}/Normal.png`,
               score: 0,
+              volume: 100,
               socketId: socket.id
           }
       ],
@@ -206,8 +203,10 @@ io.on("connection", (socket) => {
       return;
     }
 
-    // if the player is already in the game, ignore the join request
+    // if the player is already in the game, allow them to rejoin (e.g. after a refresh) without creating a new player entry
     if (game.players.some(p => p.socketId === socket.id)) {
+      socket.emit("joinSuccess", game);
+      socket.join(code);
       return;
     }
     const iconIdx = Math.floor(Math.random() * 1000) + 1;
@@ -215,6 +214,7 @@ io.on("connection", (socket) => {
     const player = {
       id: uuidv4(),
       name,
+      volume: 50,
       icon: `https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/portrait/${String(iconIdx).padStart(4, '0')}/Normal.png`,
       score: 0,
       socketId: socket.id
@@ -316,7 +316,7 @@ io.on("connection", (socket) => {
   });
 
   // Player submits an answer
-  socket.on("submitAnswer", ({ code, answer }) => {
+  socket.on("submitAnswer", ({ code, answer, timeRemaining }) => {
     const game = games.get(code);
     if (!game) return;
 
@@ -333,8 +333,9 @@ io.on("connection", (socket) => {
     game.playerAnswers[socket.id] = answer;
 
     // Check if correct and update score
-    if (answer === game.currentSong.title) {
-      player.score += 1;
+    if (answer === `${game.currentSong.game}: ${game.currentSong.title}`) {
+      const scoreForAnswer = Math.round((timeRemaining / game.levelDuration) * 1000 / 10) * 10;
+      player.score += scoreForAnswer;
     }
 
     // Notify the player their answer was received
@@ -350,13 +351,20 @@ io.on("connection", (socket) => {
     }
   });
 
-  // Clean up games when host disconnects
+  // Clean up games when a player disconnects
   socket.on("disconnect", () => {
     for (const [code, game] of games.entries()) {
       if (game.hostSocketId === socket.id) {
         if (game.roundTimer) clearTimeout(game.roundTimer);
         if (game.reviewTimer) clearTimeout(game.reviewTimer);
         games.delete(code);
+      }
+        else {
+        const playerIndex = game.players.findIndex(p => p.socketId === socket.id);
+        if (playerIndex !== -1) {
+          game.players.splice(playerIndex, 1);
+          io.to(code).emit("lobbyUpdate", game);
+        }
       }
     }
   });

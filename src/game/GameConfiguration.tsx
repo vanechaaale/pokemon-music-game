@@ -18,6 +18,7 @@ export interface Player {
   name: string;
   icon: string;
   score: number;
+  volume: number;
   socketId: string;
 }
 
@@ -96,7 +97,7 @@ export function GameConfiguration({
   ]);
   return (
     !started && (
-      <Paper shadow="sm" p="lg" radius="md" withBorder>
+      <>
         <Title order={3} mb="md">
           Game Configuration
         </Title>
@@ -188,6 +189,7 @@ export function GameConfiguration({
                 { value: "ruby_sapphire", label: "Ruby/Sapphire" },
                 { value: "diamond_pearl", label: "Diamond/Pearl" },
                 { value: "firered_leafgreen", label: "FireRed/LeafGreen" },
+                { value: "heartgold_soulsilver", label: "HeartGold/SoulSilver" },
               ]}
               placeholder="Select music sources"
               clearable
@@ -210,8 +212,7 @@ export function GameConfiguration({
         <Button onClick={startGame} mt="xl" size="md">
           Start Game
         </Button>
-      </Paper>
-    )
+   </> )
   );
 }
 

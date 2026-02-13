@@ -1,6 +1,6 @@
 import './App.css'
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { PokemonMusicQuiz } from './game/PokemonMusicGame';
+import { PokemonMusicQuiz } from './game/PokemonMusicQuiz';
 import { Home } from './Home';
 import { MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';

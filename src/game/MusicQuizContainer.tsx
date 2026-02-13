@@ -49,14 +49,15 @@ interface GameOverData {
   totalRounds: number;
 }
 
-interface MusicContainerProps {
+interface GameContainerProps {
   settings: GameSettings;
   score: number;
+  volume: number;
   onUpdateScore: (newScore: number) => void;
 }
 
-export function MusicContainer(props: MusicContainerProps) {
-  const { settings, score, onUpdateScore } = props;
+export function GameContainer(props: GameContainerProps) {
+  const { settings, score, onUpdateScore, volume } = props;
 
   // Round state from server
   const [currentRound, setCurrentRound] = useState(1);
@@ -109,6 +110,7 @@ export function MusicContainer(props: MusicContainerProps) {
     socket.emit("submitAnswer", {
       code: settings.code,
       answer: answer ?? null,
+      timeRemaining,
     });
   };
 
@@ -210,13 +212,12 @@ export function MusicContainer(props: MusicContainerProps) {
     return () => clearInterval(timer);
   }, [betweenRounds, timeBetweenRounds, isGameOver]);
 
-
   if (!songLink) {
     return <Text>Waiting for round to start...</Text>;
   }
 
   return (
-    <Paper shadow="sm" p="lg" radius="md" withBorder style={{ minWidth: "400", margin: "0 auto" } }>
+    <>
       <Group justify="space-between" mb="md">
         <Title order={3} style={{ width: "100%" }}>
           Round {currentRound} / {totalRounds}
@@ -241,7 +242,6 @@ export function MusicContainer(props: MusicContainerProps) {
         </Paper>
       ) : null}
 
-      {/* Result Feedback */}
       {correctAnswer && (
         <Paper p="md" withBorder bg={isCorrect ? "green.1" : "red.1"} mb="md">
           <Text fw={500} c={isCorrect ? "green" : "red"}>
@@ -251,28 +251,23 @@ export function MusicContainer(props: MusicContainerProps) {
         </Paper>
       )}
 
-      <Stack gap="lg" style={{ marginTop: "1rem" }} >
-        {/* YouTube Video Player */}
+      <Stack gap="lg" style={{ minWidth: "500px", marginTop: "1rem" }}>
         <AspectRatio ratio={16 / 9} style={{ pointerEvents: "none" }}>
           <MusicFrame
             key={videoKey}
             songLink={songLink}
             difficulty={difficulty}
             betweenRounds={betweenRounds}
+            volume={volume}
           />
         </AspectRatio>
 
-        {/* Timer */}
         {!isGameOver && (
           <Group gap="xs" mb="md">
             <Text size="sm" fw={500} w={40} ta="center">
-              {betweenRounds ? (
-                <Text ta="center" c="dimmed">
-                  Next round in {timeBetweenRounds}s...
-                </Text>
-              ) : (
-                `${timeRemaining}s`
-              )}
+              {betweenRounds
+                ? `Next round in ${timeBetweenRounds}s...`
+                : `${timeRemaining}s`}
             </Text>
 
             <Progress
@@ -302,31 +297,37 @@ export function MusicContainer(props: MusicContainerProps) {
         )}
 
         {/* Answer Section */}
-        {!answered && !isGameOver && !betweenRounds && (
-          <Paper p="md" withBorder>
-            <Text fw={500} mb="sm">
-              What song is this?
+        {!isGameOver &&
+          !betweenRounds &&
+          (!answered ? (
+            <Paper p="md" withBorder style={{ minWidth: "200" }}>
+              <Text fw={500} mb="sm">
+                What song is this?
+              </Text>
+              {difficulty !== "hard" ? (
+                <SongMultipleChoice
+                  options={multiChoiceOptions}
+                  answered={answered}
+                  handleAnswer={handleAnswer}
+                />
+              ) : (
+                <SongAutocomplete
+                  value={autocompleteValue}
+                  onChange={setAutocompleteValue}
+                  onSubmit={handleAutocompleteSubmit}
+                  songs={songsList}
+                  disabled={answered}
+                />
+              )}
+            </Paper>
+          ) : (
+            <Text fw={500} ta="center">
+              {"Answer submitted! Waiting for other players..."}
             </Text>
-            {difficulty !== "hard" ? (
-              <SongMultipleChoice
-                options={multiChoiceOptions}
-                answered={answered}
-                handleAnswer={handleAnswer}
-              />
-            ) : (
-              <SongAutocomplete
-                value={autocompleteValue}
-                onChange={setAutocompleteValue}
-                onSubmit={handleAutocompleteSubmit}
-                songs={songsList}
-                disabled={answered}
-              />
-            )}
-          </Paper>
-        )}
+          ))}
       </Stack>
-    </Paper>
+    </>
   );
 }
 
-export default MusicContainer;
+export default GameContainer;

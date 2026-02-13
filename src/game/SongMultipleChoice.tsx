@@ -20,16 +20,22 @@ export default function SongMultipleChoice(props: SongMultipleChoiceProps) {
   return (
     <Stack gap="sm">
       {options.map((option) => {
+        const formattedName = formatSongName(option);
         return (
           <Button
-            key={formatSongName(option)}
+            key={formattedName}
             variant="default"
             color="gray"
-            onClick={() => handleAnswer(option.title)}
+            onClick={() => handleAnswer(formattedName)}
             disabled={answered}
+            style={{
+              fontSize: ".7rem",
+              textAlign: "center",
+              flexWrap: "wrap",
+            }}
             fullWidth
           >
-            {formatSongName(option)}
+            {formattedName}
           </Button>
         );
       })}

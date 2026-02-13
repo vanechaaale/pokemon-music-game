@@ -68,5 +68,8 @@ button:focus-visible {
   .hover-outline:hover {
   outline: 5px solid gray;
   outline-offset: 3px;
-}
+  }
+  .mantine-TextInput-input:hover {
+    border-color: gray;
+  }
 }

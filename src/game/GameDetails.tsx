@@ -19,7 +19,7 @@ interface GameDetailsProps {
 }
 
 export function GameDetails(props: GameDetailsProps) {
-    const { lobbyId, settings, roundResults } = props;
+  const { lobbyId, settings, roundResults } = props;
   const [playerIconOpen, { close, toggle }] = useDisclosure(false);
 
   const iconOptions = useMemo(() => {
@@ -36,7 +36,9 @@ export function GameDetails(props: GameDetailsProps) {
   return (
     <Box p="md">
       <Box style={{ marginTop: "1rem" }}>
-        <Text size="lg">{!settings?.started ? "Players:" : "Leaderboard:"}</Text>
+        <Text size="lg" style={{ marginBottom: "0.5rem" }} fw={500}>
+          {!settings?.started ? "Players:" : "Leaderboard:"}
+        </Text>
         {settings?.players.map((player, index) => (
           <Box
             style={{
@@ -126,26 +128,24 @@ export function GameDetails(props: GameDetailsProps) {
               </Popover.Dropdown>
             </Popover>
             {player.socketId === socket.id && !settings.started ? (
-              <>
-                <TextInput
-                  key={player.id || index}
-                  defaultValue={player.name}
-                  onBlur={(e) => {
-                    const newName = e.currentTarget.value;
-                    if (newName !== player.name) {
-                      socket.emit("playerEdit", {
-                        code: lobbyId,
-                        player: {
-                          ...player,
-                          name: newName,
-                        },
-                      });
-                    }
-                  }}
-                  placeholder="Enter your name"
-                  size="md"
-                />
-              </>
+              <TextInput
+                key={player.id || index}
+                defaultValue={player.name}
+                onBlur={(e) => {
+                  const newName = e.currentTarget.value;
+                  if (newName !== player.name) {
+                    socket.emit("playerEdit", {
+                      code: lobbyId,
+                      player: {
+                        ...player,
+                        name: newName,
+                      },
+                    });
+                  }
+                }}
+                placeholder="Enter your name"
+                size="md"
+              />
             ) : (
               <>
                 <Text
@@ -156,7 +156,11 @@ export function GameDetails(props: GameDetailsProps) {
                 </Text>
                 {settings?.started && (
                   <Text size="sm" c="dimmed" style={{ marginLeft: "auto" }}>
-                    {roundResults?.find((result) => result.playerId === player.id)?.score}
+                    {
+                      roundResults?.find(
+                        (result) => result.playerId === player.id,
+                      )?.score
+                    }
                   </Text>
                 )}
               </>

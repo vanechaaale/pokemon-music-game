@@ -27,6 +27,7 @@ export function loadSongs(musicSources, songTypes) {
     ruby_sapphire: "../../public/ruby_sapphire.json",
     firered_leafgreen: "../../public/firered_leafgreen.json",
     diamond_pearl: "../../public/diamond_pearl.json",
+    heartgold_soulsilver: "../../public/heartgold_soulsilver.json",
     theme_songs: "../../public/theme_songs.json",
   };
 

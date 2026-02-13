@@ -7,9 +7,10 @@ export const MusicSource = {
   RubySapphire: 'Ruby/Sapphire',
   FireRedLeafGreen: 'FireRed/LeafGreen',
   DiamondPearl: 'Diamond/Pearl',
+  HeartGoldSoulSilver: 'HeartGold/SoulSilver',
   ThemeSongs: 'Theme Songs',
 }
-export type MusicSource = 'red_blue' | 'gold_silver' | 'theme_songs' | 'ruby_sapphire' | 'firered_leafgreen' | 'diamond_pearl';
+export type MusicSource = 'red_blue' | 'gold_silver' | 'theme_songs' | 'ruby_sapphire' | 'firered_leafgreen' | 'diamond_pearl' | 'heartgold_soulsilver';
 
 
 export const SongType = {
@@ -53,4 +54,49 @@ export function getYouTubeEmbedUrl(link: string): string {
   }
   
   return `https://www.youtube.com/embed/${videoId}?start=${startSeconds}&autoplay=1`;
+}
+
+export function parseYouTubeUrl(link: string): { videoId: string; startSeconds: number } {
+  const url = new URL(link);
+  const videoId = url.searchParams.get('v') || '';
+  const timeParam = url.searchParams.get('t');
+
+  let startSeconds = 0;
+  if (timeParam) {
+    const minuteMatch = timeParam.match(/(\d+)m/);
+    const secondMatch = timeParam.match(/(\d+)s/);
+    if (minuteMatch) startSeconds += parseInt(minuteMatch[1]) * 60;
+    if (secondMatch) startSeconds += parseInt(secondMatch[1]);
+  }
+
+  return { videoId, startSeconds };
+}
+
+// Load YouTube IFrame API
+let youtubeAPIPromise: Promise<void> | null = null;
+
+export function loadYouTubeAPI(): Promise<void> {
+  if (youtubeAPIPromise) return youtubeAPIPromise;
+
+  youtubeAPIPromise = new Promise((resolve) => {
+    // If already loaded
+    if (window.YT && window.YT.Player) {
+      resolve();
+      return;
+    }
+
+    // Set up callback for when API is ready
+    const existingCallback = window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady = () => {
+      if (existingCallback) existingCallback();
+      resolve();
+    };
+
+    // Load the script
+    const script = document.createElement('script');
+    script.src = 'https://www.youtube.com/iframe_api';
+    document.head.appendChild(script);
+  });
+
+  return youtubeAPIPromise;
 }
