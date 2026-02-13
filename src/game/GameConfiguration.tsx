@@ -5,7 +5,6 @@ import {
   MultiSelect,
   NumberInput,
   Text,
-  Paper,
   Title,
   Box,
   Button,
