@@ -8,9 +8,19 @@ import { GameDetails } from "./GameDetails";
 import { socket } from "../util/utils";
 import { notifications } from "@mantine/notifications";
 
-export function PokemonMusicGame() {
+interface RoundResult {
+  playerId: string;
+  name: string;
+  score: number;
+  wasCorrect: boolean;
+  answer: string | null;
+}
+
+export function PokemonMusicQuiz() {
   const { lobbyId } = useParams<{ lobbyId: string }>();
   const [gameSettings, setGameSettings] = useState<GameSettings | null>(null);
+  const [score, setScore] = useState(0);
+  const [roundResults, setRoundResults] = useState<RoundResult[]>([]);
   const currentPlayer =
     gameSettings?.players.find((p) => p.socketId === socket.id) || null;
   const isHost = currentPlayer?.socketId === gameSettings?.hostSocketId;
@@ -65,6 +75,18 @@ export function PokemonMusicGame() {
     };
   }, []);
 
+  useEffect(() => {
+    const handleRoundEnd = (data: { results: RoundResult[] }) => {
+      setRoundResults(data.results);
+    };
+
+    socket.on("roundEnd", handleRoundEnd);
+
+    return () => {
+      socket.off("roundEnd", handleRoundEnd);
+    };
+  }, []);
+
   return (
     <AppShell
       header={{ height: "10%" }}
@@ -82,11 +104,16 @@ export function PokemonMusicGame() {
           settings={gameSettings}
           currentPlayer={currentPlayer}
           isHost={isHost}
+          roundResults={roundResults}
         />
       </AppShell.Navbar>
       <AppShell.Main style={{ width: "100%" }}>
         {gameSettings?.started ? (
-          <MusicContainer settings={gameSettings} />
+          <MusicContainer 
+          settings={gameSettings}
+          score={score}
+          onUpdateScore={setScore}
+           />
         ) : isHost ? (
           <GameConfiguration
             settings={gameSettings || undefined}

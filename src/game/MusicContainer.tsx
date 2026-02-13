@@ -51,10 +51,12 @@ interface GameOverData {
 
 interface MusicContainerProps {
   settings: GameSettings;
+  score: number;
+  onUpdateScore: (newScore: number) => void;
 }
 
 export function MusicContainer(props: MusicContainerProps) {
-  const { settings } = props;
+  const { settings, score, onUpdateScore } = props;
 
   // Round state from server
   const [currentRound, setCurrentRound] = useState(1);
@@ -90,7 +92,6 @@ export function MusicContainer(props: MusicContainerProps) {
   const [finalScores, setFinalScores] = useState<
     { name: string; score: number }[]
   >([]);
-  const [myScore, setMyScore] = useState(0);
   const [videoKey, setVideoKey] = useState(0);
 
   // Autocomplete state for hard mode
@@ -99,6 +100,20 @@ export function MusicContainer(props: MusicContainerProps) {
   const handleAutocompleteSubmit = () => {
     if (answered) return;
     handleAnswer(autocompleteValue);
+  };
+
+  // Submit answer to server
+  const handleAnswer = (answer: string | undefined) => {
+    if (answered) return;
+
+    socket.emit("submitAnswer", {
+      code: settings.code,
+      answer: answer ?? null,
+    });
+  };
+
+  const formatSongName = (song: { title: string; game: string }) => {
+    return song.game ? `${song.game}: ${song.title}` : song.title;
   };
 
   // Listen for server events
@@ -133,7 +148,7 @@ export function MusicContainer(props: MusicContainerProps) {
       );
       if (myResult) {
         setIsCorrect(myResult.wasCorrect);
-        setMyScore(myResult.score);
+        onUpdateScore(myResult.score);
       }
     };
 
@@ -161,9 +176,8 @@ export function MusicContainer(props: MusicContainerProps) {
       socket.off("gameOver", handleGameOver);
       socket.off("answerReceived", handleAnswerReceived);
     };
-  }, [settings.players, settings.code]);
+  }, [settings.players, settings.code, onUpdateScore]);
 
-  // Client-side timer for UI display (server is authoritative)
   useEffect(() => {
     if (answered || betweenRounds || timeRemaining <= 0 || isGameOver) return;
 
@@ -180,7 +194,6 @@ export function MusicContainer(props: MusicContainerProps) {
     return () => clearInterval(timer);
   }, [answered, betweenRounds, timeRemaining, isGameOver]);
 
-  // Review phase countdown (UI only)
   useEffect(() => {
     if (!betweenRounds || timeBetweenRounds <= 0 || isGameOver) return;
 
@@ -197,26 +210,13 @@ export function MusicContainer(props: MusicContainerProps) {
     return () => clearInterval(timer);
   }, [betweenRounds, timeBetweenRounds, isGameOver]);
 
-  // Submit answer to server
-  const handleAnswer = (answer: string | undefined) => {
-    if (answered) return;
-
-    socket.emit("submitAnswer", {
-      code: settings.code,
-      answer: answer ?? null,
-    });
-  };
-
-  const formatSongName = (song: { title: string; game: string }) => {
-    return song.game ? `${song.game}: ${song.title}` : song.title;
-  };
 
   if (!songLink) {
     return <Text>Waiting for round to start...</Text>;
   }
 
   return (
-    <Paper shadow="sm" p="lg" radius="md" withBorder>
+    <Paper shadow="sm" p="lg" radius="md" withBorder style={{ minWidth: "400", margin: "0 auto" } }>
       <Group justify="space-between" mb="md">
         <Title order={3} style={{ width: "100%" }}>
           Round {currentRound} / {totalRounds}
@@ -229,7 +229,7 @@ export function MusicContainer(props: MusicContainerProps) {
             Game Over!
           </Title>
           <Text ta="center" size="xl" fw={700} mt="sm">
-            Final Score: {myScore} / {totalRounds}
+            Final Score: {score} / {totalRounds}
           </Text>
           <Stack gap="xs" mt="md">
             {finalScores.map((player, index) => (
@@ -251,7 +251,7 @@ export function MusicContainer(props: MusicContainerProps) {
         </Paper>
       )}
 
-      <Stack gap="lg" style={{ marginTop: "1rem" }}>
+      <Stack gap="lg" style={{ marginTop: "1rem" }} >
         {/* YouTube Video Player */}
         <AspectRatio ratio={16 / 9} style={{ pointerEvents: "none" }}>
           <MusicFrame

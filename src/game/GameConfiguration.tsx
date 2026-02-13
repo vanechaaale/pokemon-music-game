@@ -186,6 +186,7 @@ export function GameConfiguration({
                 { value: "gold_silver", label: "Gold/Silver" },
                 { value: "theme_songs", label: "Anime" },
                 { value: "ruby_sapphire", label: "Ruby/Sapphire" },
+                { value: "diamond_pearl", label: "Diamond/Pearl" },
                 { value: "firered_leafgreen", label: "FireRed/LeafGreen" },
               ]}
               placeholder="Select music sources"

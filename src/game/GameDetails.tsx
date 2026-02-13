@@ -9,9 +9,17 @@ interface GameDetailsProps {
   settings: GameSettings | null;
   currentPlayer: Player | null;
   isHost?: boolean;
+  roundResults?: {
+    playerId: string;
+    name: string;
+    score: number;
+    wasCorrect: boolean;
+    answer: string | null;
+  }[];
 }
 
-export function GameDetails({ lobbyId, settings }: GameDetailsProps) {
+export function GameDetails(props: GameDetailsProps) {
+    const { lobbyId, settings, roundResults } = props;
   const [playerIconOpen, { close, toggle }] = useDisclosure(false);
 
   const iconOptions = useMemo(() => {
@@ -27,10 +35,9 @@ export function GameDetails({ lobbyId, settings }: GameDetailsProps) {
 
   return (
     <Box p="md">
-      <Text size="sm">Lobby ID: {lobbyId}</Text>
       <Box style={{ marginTop: "1rem" }}>
-        <Text size="lg">Players:</Text>
-        {settings?.players?.map((player, index) => (
+        <Text size="lg">{!settings?.started ? "Players:" : "Leaderboard:"}</Text>
+        {settings?.players.map((player, index) => (
           <Box
             style={{
               display: "flex",
@@ -118,21 +125,22 @@ export function GameDetails({ lobbyId, settings }: GameDetailsProps) {
                 </Grid>
               </Popover.Dropdown>
             </Popover>
-
             {player.socketId === socket.id && !settings.started ? (
               <>
                 <TextInput
                   key={player.id || index}
-                  value={player.name}
-                  onChange={(e) => {
+                  defaultValue={player.name}
+                  onBlur={(e) => {
                     const newName = e.currentTarget.value;
-                    socket.emit("playerEdit", {
-                      code: lobbyId,
-                      player: {
-                        ...player,
-                        name: newName,
-                      },
-                    });
+                    if (newName !== player.name) {
+                      socket.emit("playerEdit", {
+                        code: lobbyId,
+                        player: {
+                          ...player,
+                          name: newName,
+                        },
+                      });
+                    }
                   }}
                   placeholder="Enter your name"
                   size="md"
@@ -146,6 +154,11 @@ export function GameDetails({ lobbyId, settings }: GameDetailsProps) {
                 >
                   {player.name}
                 </Text>
+                {settings?.started && (
+                  <Text size="sm" c="dimmed" style={{ marginLeft: "auto" }}>
+                    {roundResults?.find((result) => result.playerId === player.id)?.score}
+                  </Text>
+                )}
               </>
             )}
           </Box>
