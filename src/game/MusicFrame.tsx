@@ -38,14 +38,13 @@ export function MusicFrame(props: MusicFrameProps) {
         },
         events: {
           onReady: (event: YT.PlayerEvent) => {
-            console.log("OnReady")
             if (!isMounted) return;
             setIsReady(true);
             event.target.setVolume(volume);
           },
           onStateChange: (event: YT.OnStateChangeEvent) => {
             event.target.setVolume(volume);
-          }
+          },
         },
       });
     });

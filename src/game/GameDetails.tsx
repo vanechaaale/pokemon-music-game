@@ -9,19 +9,23 @@ interface GameDetailsProps {
   settings: GameSettings | null;
   currentPlayer: Player | null;
   isHost?: boolean;
+  phase: "LOBBY" | "IN_PROGRESS" | "REVIEW" | "GAME_OVER";
   roundResults?: {
     playerId: string;
     name: string;
     score: number;
+    pointsEarned: number;
+    newScore: number;
     wasCorrect: boolean;
     answer: string | null;
   }[];
 }
 
 export function GameDetails(props: GameDetailsProps) {
-  const { lobbyId, settings, roundResults } = props;
+  const { lobbyId, settings, roundResults, phase } = props;
   const [playerIconOpen, { close, toggle }] = useDisclosure(false);
 
+  console.log("phase:", phase);
   const iconOptions = useMemo(() => {
     const icons = [];
     for (let i = 1; i <= 151; i++) {
@@ -154,6 +158,35 @@ export function GameDetails(props: GameDetailsProps) {
                 >
                   {player.name}
                 </Text>
+
+                {phase === "REVIEW" && roundResults && (
+                  <>
+                    <Box
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 2,
+                      }}
+                    >
+                      <Text
+                        c={
+                          roundResults.find(
+                            (result) => result.playerId === player.id,
+                          )?.wasCorrect
+                            ? "green"
+                            : "red"
+                        }
+                        size="sm"
+                      >
+                        {roundResults.find(
+                          (result) => result.playerId === player.id,
+                        )?.wasCorrect
+                          ? `+${roundResults.find((result) => result.playerId === player.id)?.pointsEarned}`
+                          : "+0"}
+                      </Text>
+                    </Box>
+                  </>
+                )}
                 {settings?.started && (
                   <Text size="sm" c="dimmed" style={{ marginLeft: "auto" }}>
                     {

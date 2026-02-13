@@ -19,7 +19,6 @@ const TIME_BETWEEN_ROUNDS = 8;
 // Types for server events
 interface RoundStartData {
   round: number;
-  totalRounds: number;
   song: {
     link: string;
     type: string;
@@ -27,8 +26,6 @@ interface RoundStartData {
   };
   options: { title: string; game: string }[];
   songList: { title: string; game: string }[];
-  duration: number;
-  difficulty: "easy" | "normal" | "hard";
 }
 
 interface RoundEndData {
@@ -41,12 +38,10 @@ interface RoundEndData {
     answer: string | null;
   }[];
   round: number;
-  totalRounds: number;
 }
 
 interface GameOverData {
   finalScores: { name: string; score: number }[];
-  totalRounds: number;
 }
 
 interface GameContainerProps {
@@ -54,14 +49,14 @@ interface GameContainerProps {
   score: number;
   volume: number;
   onUpdateScore: (newScore: number) => void;
+  onUpdatePhase: (newPhase: GameSettings["phase"]) => void;
 }
 
 export function GameContainer(props: GameContainerProps) {
-  const { settings, score, onUpdateScore, volume } = props;
+  const { settings, score, onUpdateScore, volume, onUpdatePhase } = props;
 
   // Round state from server
   const [currentRound, setCurrentRound] = useState(1);
-  const [totalRounds, setTotalRounds] = useState(settings.numberOfRounds);
   const [songLink, setSongLink] = useState<string | null>(null);
   const [multiChoiceOptions, setMultiChoiceOptions] = useState<
     { title: string; game: string }[]
@@ -69,10 +64,6 @@ export function GameContainer(props: GameContainerProps) {
   const [songsList, setSongsList] = useState<{ title: string; game: string }[]>(
     [],
   );
-  const [difficulty, setDifficulty] = useState<"easy" | "normal" | "hard">(
-    settings.difficulty,
-  );
-  const [duration, setDuration] = useState(settings.levelDuration);
 
   // Answer state
   const [answered, setAnswered] = useState(false);
@@ -122,18 +113,16 @@ export function GameContainer(props: GameContainerProps) {
   useEffect(() => {
     const handleRoundStart = (data: RoundStartData) => {
       setCurrentRound(data.round);
-      setTotalRounds(data.totalRounds);
       setSongLink(data.song.link);
       setMultiChoiceOptions(data.options);
       setSongsList(data.songList);
-      setDuration(data.duration);
-      setDifficulty(data.difficulty);
-      setTimeRemaining(data.duration);
+      setTimeRemaining(settings.levelDuration);
       setAnswered(false);
       setCorrectAnswer(null);
       setBetweenRounds(false);
       setVideoKey((k) => k + 1);
       setAutocompleteValue("");
+      onUpdatePhase("IN_PROGRESS");
     };
 
     const handleRoundEnd = (data: RoundEndData) => {
@@ -178,7 +167,7 @@ export function GameContainer(props: GameContainerProps) {
       socket.off("gameOver", handleGameOver);
       socket.off("answerReceived", handleAnswerReceived);
     };
-  }, [settings.players, settings.code, onUpdateScore]);
+  }, [settings.players, settings.code, onUpdateScore, settings.levelDuration]);
 
   useEffect(() => {
     if (answered || betweenRounds || timeRemaining <= 0 || isGameOver) return;
@@ -220,7 +209,7 @@ export function GameContainer(props: GameContainerProps) {
     <>
       <Group justify="space-between" mb="md">
         <Title order={3} style={{ width: "100%" }}>
-          Round {currentRound} / {totalRounds}
+          Round {currentRound} / {settings.numberOfRounds}
         </Title>
       </Group>
 
@@ -230,7 +219,7 @@ export function GameContainer(props: GameContainerProps) {
             Game Over!
           </Title>
           <Text ta="center" size="xl" fw={700} mt="sm">
-            Final Score: {score} / {totalRounds}
+            Final Score: {score} / {settings.numberOfRounds}
           </Text>
           <Stack gap="xs" mt="md">
             {finalScores.map((player, index) => (
@@ -256,7 +245,7 @@ export function GameContainer(props: GameContainerProps) {
           <MusicFrame
             key={videoKey}
             songLink={songLink}
-            difficulty={difficulty}
+            difficulty={settings.difficulty}
             betweenRounds={betweenRounds}
             volume={volume}
           />
@@ -274,7 +263,7 @@ export function GameContainer(props: GameContainerProps) {
               value={
                 betweenRounds
                   ? (timeBetweenRounds / TIME_BETWEEN_ROUNDS) * 100
-                  : (timeRemaining / duration) * 100
+                  : (timeRemaining / settings.levelDuration) * 100
               }
               size="lg"
               radius="xl"
@@ -304,7 +293,7 @@ export function GameContainer(props: GameContainerProps) {
               <Text fw={500} mb="sm">
                 What song is this?
               </Text>
-              {difficulty !== "hard" ? (
+              {settings.difficulty !== "hard" ? (
                 <SongMultipleChoice
                   options={multiChoiceOptions}
                   answered={answered}

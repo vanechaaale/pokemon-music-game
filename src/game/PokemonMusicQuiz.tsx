@@ -10,10 +10,12 @@ import { notifications } from "@mantine/notifications";
 import { useDisclosure } from "@mantine/hooks";
 import { IconMusic } from "@tabler/icons-react";
 
-interface RoundResult {
+export interface RoundResult {
   playerId: string;
   name: string;
   score: number;
+  pointsEarned: number;
+  newScore: number;
   wasCorrect: boolean;
   answer: string | null;
 }
@@ -27,6 +29,7 @@ export function PokemonMusicQuiz() {
     gameSettings?.players.find((p) => p.socketId === socket.id) || null;
   const [volume, setVolume] = useState(currentPlayer?.volume || 50);
   const isHost = currentPlayer?.socketId === gameSettings?.hostSocketId;
+  const [phase, setPhase] = useState(gameSettings?.phase || "LOBBY");
 
   const startGame = useCallback(
     (settings: GameSettings) => {
@@ -79,8 +82,12 @@ export function PokemonMusicQuiz() {
   }, []);
 
   useEffect(() => {
-    const handleRoundEnd = (data: { results: RoundResult[] }) => {
+    const handleRoundEnd = (
+      data: { results: RoundResult[] },
+      phase: GameSettings["phase"],
+    ) => {
       setRoundResults(data.results);
+      setPhase(phase);
     };
 
     socket.on("roundEnd", handleRoundEnd);
@@ -112,6 +119,7 @@ export function PokemonMusicQuiz() {
           settings={gameSettings}
           currentPlayer={currentPlayer}
           isHost={isHost}
+          phase={phase}
           roundResults={roundResults}
         />
       </AppShell.Navbar>
@@ -154,6 +162,7 @@ export function PokemonMusicQuiz() {
               score={score}
               volume={volume}
               onUpdateScore={setScore}
+              onUpdatePhase={setPhase}
             />
           ) : isHost ? (
             <GameConfiguration

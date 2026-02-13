@@ -42,6 +42,7 @@ function startRound(game) {
   game.usedSongs.push(selectedSong.title);
   game.round += 1;
   game.playerAnswers = {};
+  game.playerPointsEarned = {};
   game.phase = "IN_PROGRESS";
 
   // Generate multiple choice options (for easy/normal mode)
@@ -78,9 +79,9 @@ function startRound(game) {
     options,
     songList,
     duration: game.levelDuration,
-    difficulty: game.difficulty,
-    code: game.code,
-  });
+  },
+  game.phase,
+);
 
   // Set round timer
   if (game.roundTimer) clearTimeout(game.roundTimer);
@@ -104,7 +105,9 @@ function endRound(game) {
     return {
       playerId: player.id,
       name: player.name,
+      pointsEarned: game.playerPointsEarned[player.socketId] || 0,
       score: player.score,
+      newScore: player.score,
       wasCorrect,
       volume: player.volume,
       answer: answer || null,
@@ -120,7 +123,9 @@ function endRound(game) {
     results,
     round: game.round,
     totalRounds: game.numberOfRounds,
-  });
+  },
+  game.phase,
+);
 
   // After review period, start next round or end game
   game.reviewTimer = setTimeout(() => {
@@ -335,11 +340,12 @@ io.on("connection", (socket) => {
     // Check if correct and update score
     if (answer === `${game.currentSong.game}: ${game.currentSong.title}`) {
       const scoreForAnswer = Math.round((timeRemaining / game.levelDuration) * 1000 / 10) * 10;
+      game.playerPointsEarned[socket.id] = scoreForAnswer;
       player.score += scoreForAnswer;
     }
 
     // Notify the player their answer was received
-    socket.emit("answerReceived", { answer });
+    // socket.emit("answerReceived", { answer });
 
     // Check if all players have answered
     const allAnswered = game.players.every(
