@@ -1,10 +1,10 @@
-import { AppShell, Box, Button, Paper, TextInput } from "@mantine/core";
+import { Box, Button, Paper, TextInput, Text, AppShell } from "@mantine/core";
 import { useNavigate } from "react-router-dom";
-import Header from "./Header";
 import { useEffect, useState } from "react";
 import { socket } from "./util/utils";
 import { notifications } from "@mantine/notifications";
 import "@mantine/notifications/styles.css";
+import Header from "./Header";
 
 export function Home() {
   const navigate = useNavigate();
@@ -66,15 +66,12 @@ export function Home() {
   };
 
   return (
-    <>
-      <AppShell header={{ height: 60 }} padding="md">
-        <Header />
-        <AppShell.Main>
-          <h1>Welcome to Pokemon Music Quiz!</h1>
-          <p>
-            Test your knowledge of Pokemon music across all generations. Can you
-            name the song from just a few seconds of music?
-          </p>
+     <AppShell header={{ height: "5%" }}
+          navbar={{
+            width: "20%",
+            breakpoint: 'sm',
+          }}>
+          <Header />
           <Box
             style={{
               display: "flex",
@@ -85,6 +82,11 @@ export function Home() {
               alignItems: "center",
             }}
           >
+          <Text> {`Welcome to Pokemon Music Quiz!`}</Text>
+          <Text>
+            {`Test your knowledge of Pokemon music across all generations. Can you
+            name the song from just a few seconds of music?`}
+          </Text>
             <Paper p="md" withBorder>
               <TextInput
                 label="Lobby ID"
@@ -103,8 +105,6 @@ export function Home() {
               <Button onClick={createGame}>New Lobby</Button>
             </Paper>
           </Box>
-        </AppShell.Main>
       </AppShell>
-    </>
   );
 }

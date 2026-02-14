@@ -1,4 +1,4 @@
-import { AppShell, Group, Text } from "@mantine/core";
+import { AppShell, Text } from "@mantine/core";
 import { useNavigate } from "react-router-dom";
 
 export function Header() {
@@ -6,15 +6,13 @@ export function Header() {
 
   return (
     <AppShell.Header>
-      <Group h="100%" px="md">
-        <Text
-          style={{ cursor: "pointer" }}
-          onClick={() => navigate("/home")}
+        <Text 
+          style={{ cursor: "pointer", float: "left", paddingLeft: "1rem", zIndex: 1000 }}
+          onClick={() => navigate("/")}
           fw={500}
         >
           Pokemon Music Quiz
         </Text>
-      </Group>
     </AppShell.Header>
   );
 }

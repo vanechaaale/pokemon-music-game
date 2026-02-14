@@ -1,6 +1,5 @@
 import { ActionIcon, AppShell, Box, Paper, Popover } from "@mantine/core";
 import { useParams } from "react-router-dom";
-import Header from "../Header";
 import GameConfiguration, { type GameSettings } from "./GameConfiguration";
 import GameContainer from "./MusicQuizContainer";
 import { useState, useEffect, useCallback } from "react";
@@ -9,6 +8,7 @@ import { socket } from "../util/utils";
 import { notifications } from "@mantine/notifications";
 import { useDisclosure } from "@mantine/hooks";
 import { IconMusic } from "@tabler/icons-react";
+import Header from "../Header";
 
 export interface RoundResult {
   playerId: string;
@@ -100,20 +100,22 @@ export function PokemonMusicQuiz() {
 
   return (
     <AppShell
-      header={{ height: "10%" }}
+      header={{ height: "5%", }}
       navbar={{
         width: "20%",
-        collapsed: { mobile: true },
         breakpoint: "sm",
       }}
       styles={{
-        root: {
-          height: "100vh",
-        },
+        main: {
+          marginLeft: "20%",
+          alignItems: "center",
+          verticalAlign: "top",
+          display: "flex",
+        }
       }}
     >
       <Header />
-      <AppShell.Navbar p="md">
+      <AppShell.Navbar>
         <GameDetails
           lobbyId={lobbyId || ""}
           settings={gameSettings}
@@ -123,13 +125,8 @@ export function PokemonMusicQuiz() {
           roundResults={roundResults}
         />
       </AppShell.Navbar>
-      <AppShell.Main style={{ width: "100%" }}>
-        <Paper
-          shadow="sm"
-          p="lg"
-          radius="md"
-          withBorder
-          style={{ minWidth: "600px", margin: "0 auto" }}
+      <AppShell.Main>
+        <Paper shadow="sm" p="lg" radius="md" withBorder 
         >
           <Box style={{ display: "flex", justifyContent: "flex-end" }}>
             <Popover
@@ -142,7 +139,7 @@ export function PokemonMusicQuiz() {
             >
               <Popover.Target>
                 <ActionIcon onClick={toggle}>
-                  <IconMusic size={25} />
+                  <IconMusic size={20} />
                 </ActionIcon>
               </Popover.Target>
               <Popover.Dropdown>

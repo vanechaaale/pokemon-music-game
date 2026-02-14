@@ -6,6 +6,7 @@ import {
   Stack,
   Group,
   Progress,
+  Box,
 } from "@mantine/core";
 import { useState, useEffect } from "react";
 import { type GameSettings } from "./GameConfiguration";
@@ -167,7 +168,13 @@ export function GameContainer(props: GameContainerProps) {
       socket.off("gameOver", handleGameOver);
       socket.off("answerReceived", handleAnswerReceived);
     };
-  }, [settings.players, settings.code, onUpdateScore, settings.levelDuration]);
+  }, [
+    settings.players,
+    settings.code,
+    onUpdateScore,
+    settings.levelDuration,
+    onUpdatePhase,
+  ]);
 
   useEffect(() => {
     if (answered || betweenRounds || timeRemaining <= 0 || isGameOver) return;
@@ -239,8 +246,7 @@ export function GameContainer(props: GameContainerProps) {
           </Text>
         </Paper>
       )}
-
-      <Stack gap="lg" style={{ minWidth: "500px", marginTop: "1rem" }}>
+      <Stack gap="lg" style={{ width: "100%", marginTop: "1rem" }}>
         <AspectRatio ratio={16 / 9} style={{ pointerEvents: "none" }}>
           <MusicFrame
             key={videoKey}
@@ -289,7 +295,8 @@ export function GameContainer(props: GameContainerProps) {
         {!isGameOver &&
           !betweenRounds &&
           (!answered ? (
-            <Paper p="md" withBorder style={{ minWidth: "200" }}>
+            // <Paper p="md" withBorder style={{ minWidth: "200" }}>
+            <Box>
               <Text fw={500} mb="sm">
                 What song is this?
               </Text>
@@ -308,8 +315,9 @@ export function GameContainer(props: GameContainerProps) {
                   disabled={answered}
                 />
               )}
-            </Paper>
+            </Box>
           ) : (
+            // </Paper>
             <Text fw={500} ta="center">
               {"Answer submitted! Waiting for other players..."}
             </Text>

@@ -19,7 +19,6 @@ export const SongType = {
   Battle: 'battle_theme',
   Action: 'action',
   Theme: 'theme',
-  Event: 'event',
 } as const;
 
 export type SongType = typeof SongType[keyof typeof SongType];

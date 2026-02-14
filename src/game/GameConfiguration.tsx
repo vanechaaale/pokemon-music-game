@@ -107,13 +107,12 @@ export function GameConfiguration({
             justifyContent: "center",
             flexDirection: "row",
           }}
-          gap="xl"
         >
           <Box
             style={{
-              width: "50%",
+              // width: "50%",
               display: "flex",
-              gap: "1rem",
+              // gap: "1rem",
               flexDirection: "column",
               alignItems: "center",
             }}
@@ -192,7 +191,7 @@ export function GameConfiguration({
               ]}
               placeholder="Select music sources"
               clearable
-              style={{ width: "100%" }}
+              style={{ maxWidth: "50%" }}
             />
             <Text mb="xs" style={{ marginTop: "1rem" }}>
               Filters
@@ -203,7 +202,7 @@ export function GameConfiguration({
               data={SONG_TYPE_OPTIONS}
               placeholder="Select filters"
               clearable
-              style={{ width: "100%" }}
+              style={{ maxWidth: "50%" }}
             />
           </Box>
         </Stack>

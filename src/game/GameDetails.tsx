@@ -38,8 +38,7 @@ export function GameDetails(props: GameDetailsProps) {
   }, []);
 
   return (
-    <Box p="md">
-      <Box style={{ marginTop: "1rem" }}>
+      <Box >
         <Text size="lg" style={{ marginBottom: "0.5rem" }} fw={500}>
           {!settings?.started ? "Players:" : "Leaderboard:"}
         </Text>
@@ -201,7 +200,6 @@ export function GameDetails(props: GameDetailsProps) {
           </Box>
         )) || <Text>No players joined yet</Text>}
       </Box>
-    </Box>
   );
 }
 
