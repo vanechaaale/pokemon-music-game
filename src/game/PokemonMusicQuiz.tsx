@@ -1,7 +1,7 @@
 import { ActionIcon, AppShell, Box, Paper, Popover } from "@mantine/core";
 import { useParams } from "react-router-dom";
 import GameConfiguration, { type GameSettings } from "./GameConfiguration";
-import GameContainer from "./MusicQuizContainer";
+import MusicQuiz from "./MusicQuiz";
 import { useState, useEffect, useCallback } from "react";
 import { GameDetails } from "./GameDetails";
 import { socket } from "../util/utils";
@@ -103,15 +103,7 @@ export function PokemonMusicQuiz() {
       header={{ height: "5%", }}
       navbar={{
         width: "20%",
-        breakpoint: "sm",
-      }}
-      styles={{
-        main: {
-          marginLeft: "20%",
-          alignItems: "center",
-          verticalAlign: "top",
-          display: "flex",
-        }
+        breakpoint: 0,
       }}
     >
       <Header />
@@ -125,9 +117,16 @@ export function PokemonMusicQuiz() {
           roundResults={roundResults}
         />
       </AppShell.Navbar>
-      <AppShell.Main>
-        <Paper shadow="sm" p="lg" radius="md" withBorder 
-        >
+      <AppShell.Main
+        style={{
+          position: "relative",
+          marginLeft: "20%",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "flex-start"
+        }}
+      >
+        <Paper shadow="sm" p="lg" radius="md" withBorder>
           <Box style={{ display: "flex", justifyContent: "flex-end" }}>
             <Popover
               opened={settingsOpen}
@@ -154,7 +153,7 @@ export function PokemonMusicQuiz() {
             </Popover>
           </Box>
           {gameSettings?.started ? (
-            <GameContainer
+            <MusicQuiz
               settings={gameSettings}
               score={score}
               volume={volume}

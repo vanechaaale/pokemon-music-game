@@ -110,9 +110,7 @@ export function GameConfiguration({
         >
           <Box
             style={{
-              // width: "50%",
               display: "flex",
-              // gap: "1rem",
               flexDirection: "column",
               alignItems: "center",
             }}
@@ -187,7 +185,10 @@ export function GameConfiguration({
                 { value: "ruby_sapphire", label: "Ruby/Sapphire" },
                 { value: "diamond_pearl", label: "Diamond/Pearl" },
                 { value: "firered_leafgreen", label: "FireRed/LeafGreen" },
-                { value: "heartgold_soulsilver", label: "HeartGold/SoulSilver" },
+                {
+                  value: "heartgold_soulsilver",
+                  label: "HeartGold/SoulSilver",
+                },
               ]}
               placeholder="Select music sources"
               clearable
@@ -210,7 +211,8 @@ export function GameConfiguration({
         <Button onClick={startGame} mt="xl" size="md">
           Start Game
         </Button>
-   </> )
+      </>
+    )
   );
 }
 

@@ -45,7 +45,7 @@ interface GameOverData {
   finalScores: { name: string; score: number }[];
 }
 
-interface GameContainerProps {
+interface MusicQuizProps {
   settings: GameSettings;
   score: number;
   volume: number;
@@ -53,7 +53,7 @@ interface GameContainerProps {
   onUpdatePhase: (newPhase: GameSettings["phase"]) => void;
 }
 
-export function GameContainer(props: GameContainerProps) {
+export function MusicQuiz(props: MusicQuizProps) {
   const { settings, score, onUpdateScore, volume, onUpdatePhase } = props;
 
   // Round state from server
@@ -213,118 +213,117 @@ export function GameContainer(props: GameContainerProps) {
   }
 
   return (
-    <>
-      <Group justify="space-between" mb="md">
-        <Title order={3} style={{ width: "100%" }}>
+    settings.started && (
+      <>
+        <Title order={3} mb="md">
           Round {currentRound} / {settings.numberOfRounds}
         </Title>
-      </Group>
+            <Box style={{ width: "100%", 
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center", }}>
+              {isGameOver ? (
+                <Box p="lg" bg="blue.1" style={{ marginBottom: "1rem" }}>
+                  <Title order={3} ta="center">
+                    Game Over!
+                  </Title>
+                  <Text ta="center" size="xl" fw={700} mt="sm">
+                    Final Score: {score} / {settings.numberOfRounds}
+                  </Text>
+                  <Stack gap="xs" mt="md">
+                    {finalScores.map((player, index) => (
+                      <Text key={index} ta="center">
+                        {index + 1}. {player.name}: {player.score}
+                      </Text>
+                    ))}
+                  </Stack>
+                </Box>
+              ) : null}
 
-      {isGameOver ? (
-        <Paper p="lg" withBorder bg="blue.1" style={{ marginBottom: "1rem" }}>
-          <Title order={3} ta="center">
-            Game Over!
-          </Title>
-          <Text ta="center" size="xl" fw={700} mt="sm">
-            Final Score: {score} / {settings.numberOfRounds}
-          </Text>
-          <Stack gap="xs" mt="md">
-            {finalScores.map((player, index) => (
-              <Text key={index} ta="center">
-                {index + 1}. {player.name}: {player.score}
-              </Text>
-            ))}
-          </Stack>
-        </Paper>
-      ) : null}
-
-      {correctAnswer && (
-        <Paper p="md" withBorder bg={isCorrect ? "green.1" : "red.1"} mb="md">
-          <Text fw={500} c={isCorrect ? "green" : "red"}>
-            {(isCorrect ? "✓ Correct!" : "✗ Wrong!") +
-              ` The answer was: ${formatSongName(correctAnswer)}`}
-          </Text>
-        </Paper>
-      )}
-      <Stack gap="lg" style={{ width: "100%", marginTop: "1rem" }}>
-        <AspectRatio ratio={16 / 9} style={{ pointerEvents: "none" }}>
-          <MusicFrame
-            key={videoKey}
-            songLink={songLink}
-            difficulty={settings.difficulty}
-            betweenRounds={betweenRounds}
-            volume={volume}
-          />
-        </AspectRatio>
-
-        {!isGameOver && (
-          <Group gap="xs" mb="md">
-            <Text size="sm" fw={500} w={40} ta="center">
-              {betweenRounds
-                ? `Next round in ${timeBetweenRounds}s...`
-                : `${timeRemaining}s`}
-            </Text>
-
-            <Progress
-              value={
-                betweenRounds
-                  ? (timeBetweenRounds / TIME_BETWEEN_ROUNDS) * 100
-                  : (timeRemaining / settings.levelDuration) * 100
-              }
-              size="lg"
-              radius="xl"
-              color={
-                betweenRounds
-                  ? "grape"
-                  : timeRemaining <= 5
-                    ? "red"
-                    : timeRemaining <= 10
-                      ? "yellow"
-                      : "blue"
-              }
-              style={{ flex: 1 }}
-              animated={
-                (!answered && timeRemaining > 0) ||
-                (betweenRounds && timeBetweenRounds > 0)
-              }
-            />
-          </Group>
-        )}
-
-        {/* Answer Section */}
-        {!isGameOver &&
-          !betweenRounds &&
-          (!answered ? (
-            // <Paper p="md" withBorder style={{ minWidth: "200" }}>
-            <Box>
-              <Text fw={500} mb="sm">
-                What song is this?
-              </Text>
-              {settings.difficulty !== "hard" ? (
-                <SongMultipleChoice
-                  options={multiChoiceOptions}
-                  answered={answered}
-                  handleAnswer={handleAnswer}
-                />
-              ) : (
-                <SongAutocomplete
-                  value={autocompleteValue}
-                  onChange={setAutocompleteValue}
-                  onSubmit={handleAutocompleteSubmit}
-                  songs={songsList}
-                  disabled={answered}
-                />
+              {correctAnswer && (
+                <Box p="md" bg={isCorrect ? "green.1" : "red.1"} mb="md">
+                  <Text fw={500} c={isCorrect ? "green" : "red"}>
+                    {(isCorrect ? "✓ Correct!" : "✗ Wrong!") +
+                      ` The answer was: ${formatSongName(correctAnswer)}`}
+                  </Text>
+                </Box>
               )}
+              <MusicFrame
+                key={videoKey}
+                songLink={songLink}
+                difficulty={settings.difficulty}
+                betweenRounds={betweenRounds}
+                volume={volume}
+              />
+              <Box>
+                {!isGameOver && (
+                  <>
+                    <Text size="sm" fw={500} w={40} ta="center">
+                      {betweenRounds
+                        ? `Next round in ${timeBetweenRounds}s...`
+                        : `${timeRemaining}s`}
+                    </Text>
+
+                    <Progress
+                      value={
+                        betweenRounds
+                          ? (timeBetweenRounds / TIME_BETWEEN_ROUNDS) * 100
+                          : (timeRemaining / settings.levelDuration) * 100
+                      }
+                      size="lg"
+                      radius="xl"
+                      color={
+                        betweenRounds
+                          ? "grape"
+                          : timeRemaining <= 5
+                            ? "red"
+                            : timeRemaining <= 10
+                              ? "yellow"
+                              : "blue"
+                      }
+                      style={{ flex: 1 }}
+                      animated={
+                        (!answered && timeRemaining > 0) ||
+                        (betweenRounds && timeBetweenRounds > 0)
+                      }
+                    />
+                  </>
+                )}
+              </Box>
             </Box>
-          ) : (
-            // </Paper>
-            <Text fw={500} ta="center">
-              {"Answer submitted! Waiting for other players..."}
-            </Text>
-          ))}
-      </Stack>
-    </>
+
+            {/* Answer Section */}
+            {!isGameOver &&
+              !betweenRounds &&
+              (!answered ? (
+                <Box>
+                  <Text fw={500} mb="sm">
+                    What song is this?
+                  </Text>
+                  {settings.difficulty !== "hard" ? (
+                    <SongMultipleChoice
+                      options={multiChoiceOptions}
+                      answered={answered}
+                      handleAnswer={handleAnswer}
+                    />
+                  ) : (
+                    <SongAutocomplete
+                      value={autocompleteValue}
+                      onChange={setAutocompleteValue}
+                      onSubmit={handleAutocompleteSubmit}
+                      songs={songsList}
+                      disabled={answered}
+                    />
+                  )}
+                </Box>
+              ) : (
+                <Text fw={500} ta="center">
+                  {"Answer submitted! Waiting for other players..."}
+                </Text>
+              ))}
+      </>
+    )
   );
 }
 
-export default GameContainer;
+export default MusicQuiz;

@@ -53,6 +53,12 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+.mantine-Paper-root {
+  padding: 1em;
+  border-radius: 8px;
+  margin-left: '500px';
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     color: #213547;

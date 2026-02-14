@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { loadYouTubeAPI, parseYouTubeUrl } from "../util/utils";
+import { AspectRatio, Box } from "@mantine/core";
 
 interface MusicFrameProps {
   songLink: string;
@@ -67,17 +68,9 @@ export function MusicFrame(props: MusicFrameProps) {
   }, [songLink, isReady]);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        width: "100%",
-        height: "100%",
-      }}
-    >
-      {/* Video container */}
-      <div style={{ position: "relative", width: "100%", flexGrow: 1 }}>
-        <div
+    <AspectRatio ratio={16 / 9} style={{ pointerEvents: "none", width: "100%" }}>
+      <Box style={{ position: "relative" }}>
+        <Box
           ref={playerContainerRef}
           style={{
             width: "100%",
@@ -105,8 +98,8 @@ export function MusicFrame(props: MusicFrameProps) {
             }}
           />
         )}
-      </div>
-    </div>
+      </Box>
+    </AspectRatio>
   );
 }
 

@@ -18,7 +18,10 @@ const io = new Server(server, {
 });
 
 server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  if (process.env.NODE_ENV !== "production") {
+    console.log(`Server running on port ${PORT}`);
+    server.emit("isAdmin", { admin: true });
+  }
 });
 
 const games = new Map();
