@@ -217,7 +217,7 @@ io.on("connection", (socket) => {
       socket.join(code);
       return;
     }
-    const iconIdx = Math.floor(Math.random() * 1000) + 1;
+    const iconIdx = Math.floor(Math.random() * 151) + 1;
 
     const player = {
       id: uuidv4(),

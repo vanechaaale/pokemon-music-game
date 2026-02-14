@@ -1,4 +1,15 @@
-import { ActionIcon, AppShell, Box, Paper, Popover } from "@mantine/core";
+import {
+  ActionIcon,
+  AppShell,
+  Box,
+  Center,
+  Container,
+  Drawer,
+  Grid,
+  Paper,
+  Popover,
+  Stack,
+} from "@mantine/core";
 import { useParams } from "react-router-dom";
 import GameConfiguration, { type GameSettings } from "./GameConfiguration";
 import MusicQuiz from "./MusicQuiz";
@@ -99,90 +110,85 @@ export function PokemonMusicQuiz() {
   const [settingsOpen, { close, toggle }] = useDisclosure(false);
 
   return (
-    <AppShell
-      header={{ height: "5%", }}
-      navbar={{
-        width: "20%",
-        breakpoint: 0,
-      }}
-    >
+    <AppShell header={{ height: "5%" }}>
       <Header />
-      <AppShell.Navbar>
-        <GameDetails
-          lobbyId={lobbyId || ""}
-          settings={gameSettings}
-          currentPlayer={currentPlayer}
-          isHost={isHost}
-          phase={phase}
-          roundResults={roundResults}
-        />
-      </AppShell.Navbar>
-      <AppShell.Main
-        style={{
-          position: "relative",
-          marginLeft: "20%",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "flex-start"
-        }}
-      >
-        <Paper shadow="sm" p="lg" radius="md" withBorder>
-          <Box style={{ display: "flex", justifyContent: "flex-end" }}>
-            <Popover
-              opened={settingsOpen}
-              onClose={close}
-              onDismiss={close}
-              position="top"
-              withArrow
-              shadow="md"
-            >
-              <Popover.Target>
-                <ActionIcon onClick={toggle}>
-                  <IconMusic size={20} />
-                </ActionIcon>
-              </Popover.Target>
-              <Popover.Dropdown>
-                <input
-                  type="range"
-                  min={0}
-                  max={100}
-                  value={volume}
-                  onChange={(e) => setVolume(parseInt(e.target.value, 10))}
-                />
-              </Popover.Dropdown>
-            </Popover>
-          </Box>
-          {gameSettings?.started ? (
-            <MusicQuiz
+      <AppShell.Main>
+        <Grid style={{ height: "100%" }}>
+          <Grid.Col span={4} style={{ height: "100%" }}>
+            <GameDetails
+              lobbyId={lobbyId || ""}
               settings={gameSettings}
-              score={score}
-              volume={volume}
-              onUpdateScore={setScore}
-              onUpdatePhase={setPhase}
+              currentPlayer={currentPlayer}
+              isHost={isHost}
+              phase={phase}
+              roundResults={roundResults}
             />
-          ) : isHost ? (
-            <GameConfiguration
-              settings={gameSettings || undefined}
-              started={gameSettings?.started || false}
-              onStartGame={startGame}
-            />
-          ) : (
-            <Box
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                textAlign: "center",
-              }}
-            >
-              <img
-                style={{ marginBottom: "10px" }}
-                src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExMXpuNGk0MHppc3R4eTY3NTZvejN0enN6aGpmbnZ1YjZybWNybm55ciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ng88DijbQOzq8nPJmv/giphy.gif"
-              />
-              Waiting for host to start ...
-            </Box>
-          )}
-        </Paper>
+          </Grid.Col>
+          <Grid.Col span={6} style={{ height: "100%" }}>
+            <Center style={{ width: "100%" }}>
+              <Paper shadow="sm" p="lg" radius="md" withBorder>
+                <Box style={{ display: "flex", justifyContent: "flex-end" }}>
+                  <Popover
+                    opened={settingsOpen}
+                    onClose={close}
+                    onDismiss={close}
+                    position="top"
+                    withArrow
+                    shadow="md"
+                  >
+                    <Popover.Target>
+                      <ActionIcon onClick={toggle}>
+                        <IconMusic size={20} />
+                      </ActionIcon>
+                    </Popover.Target>
+                    <Popover.Dropdown>
+                      <input
+                        type="range"
+                        min={0}
+                        max={100}
+                        value={volume}
+                        onChange={(e) =>
+                          setVolume(parseInt(e.target.value, 10))
+                        }
+                      />
+                    </Popover.Dropdown>
+                  </Popover>
+                </Box>
+                {gameSettings?.started ? (
+                  <MusicQuiz
+                    settings={gameSettings}
+                    score={score}
+                    volume={volume}
+                    onUpdateScore={setScore}
+                    onUpdatePhase={setPhase}
+                  />
+                ) : isHost ? (
+                  <GameConfiguration
+                    settings={gameSettings || undefined}
+                    started={gameSettings?.started || false}
+                    onStartGame={startGame}
+                  />
+                ) : (
+                  <Box
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      textAlign: "center",
+                    }}
+                  >
+                    <img
+                      style={{ marginBottom: "10px" }}
+                      src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExMXpuNGk0MHppc3R4eTY3NTZvejN0enN6aGpmbnZ1YjZybWNybm55ciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ng88DijbQOzq8nPJmv/giphy.gif"
+                    />
+                    Waiting for host to start ...
+                  </Box>
+                )}
+              </Paper>
+            </Center>
+          </Grid.Col>
+          <Grid.Col span={2} style={{ height: "100%" }}></Grid.Col>
+        </Grid>
       </AppShell.Main>
     </AppShell>
   );

@@ -218,11 +218,14 @@ export function MusicQuiz(props: MusicQuizProps) {
         <Title order={3} mb="md">
           Round {currentRound} / {settings.numberOfRounds}
         </Title>
-            <Box style={{ width: "100%", 
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center", }}>
-              {isGameOver ? (
+        <Stack style={{
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "row",
+          }}>
+
+            <Box style={{ width: "100%"}}>
+              {isGameOver && (
                 <Box p="lg" bg="blue.1" style={{ marginBottom: "1rem" }}>
                   <Title order={3} ta="center">
                     Game Over!
@@ -238,7 +241,7 @@ export function MusicQuiz(props: MusicQuizProps) {
                     ))}
                   </Stack>
                 </Box>
-              ) : null}
+              )}
 
               {correctAnswer && (
                 <Box p="md" bg={isCorrect ? "green.1" : "red.1"} mb="md">
@@ -248,6 +251,7 @@ export function MusicQuiz(props: MusicQuizProps) {
                   </Text>
                 </Box>
               )}
+
               <MusicFrame
                 key={videoKey}
                 songLink={songLink}
@@ -296,7 +300,7 @@ export function MusicQuiz(props: MusicQuizProps) {
             {!isGameOver &&
               !betweenRounds &&
               (!answered ? (
-                <Box>
+                <Box style={{ position: "relative"}}>
                   <Text fw={500} mb="sm">
                     What song is this?
                   </Text>
@@ -321,6 +325,7 @@ export function MusicQuiz(props: MusicQuizProps) {
                   {"Answer submitted! Waiting for other players..."}
                 </Text>
               ))}
+          </Stack>
       </>
     )
   );

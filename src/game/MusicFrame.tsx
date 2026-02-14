@@ -69,7 +69,6 @@ export function MusicFrame(props: MusicFrameProps) {
 
   return (
     <AspectRatio ratio={16 / 9} style={{ pointerEvents: "none", width: "100%" }}>
-      <Box style={{ position: "relative" }}>
         <Box
           ref={playerContainerRef}
           style={{
@@ -98,7 +97,6 @@ export function MusicFrame(props: MusicFrameProps) {
             }}
           />
         )}
-      </Box>
     </AspectRatio>
   );
 }

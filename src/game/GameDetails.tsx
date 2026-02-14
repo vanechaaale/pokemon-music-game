@@ -1,4 +1,4 @@
-import { Box, Grid, Popover, Text, TextInput } from "@mantine/core";
+import { Box, Grid, Popover, Stack, Text, TextInput } from "@mantine/core";
 import type { GameSettings, Player } from "./GameConfiguration";
 import { socket } from "../util/utils";
 import { useMemo } from "react";
@@ -38,7 +38,13 @@ export function GameDetails(props: GameDetailsProps) {
   }, []);
 
   return (
-      <Box >
+      <Stack 
+       style={{
+        padding: "1rem",
+        align: "flex-start",
+        justify: "flex-start",
+       }}
+      >
         <Text size="lg" style={{ marginBottom: "0.5rem" }} fw={500}>
           {!settings?.started ? "Players:" : "Leaderboard:"}
         </Text>
@@ -199,7 +205,7 @@ export function GameDetails(props: GameDetailsProps) {
             )}
           </Box>
         )) || <Text>No players joined yet</Text>}
-      </Box>
+      </Stack>
   );
 }
 
