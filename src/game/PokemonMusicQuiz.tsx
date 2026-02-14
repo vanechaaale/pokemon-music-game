@@ -114,7 +114,7 @@ export function PokemonMusicQuiz() {
       <Header />
       <AppShell.Main>
         <Grid style={{ height: "100%" }}>
-          <Grid.Col span={4} style={{ height: "100%" }}>
+          <Grid.Col span={3} style={{ height: "100%" }}>
             <GameDetails
               lobbyId={lobbyId || ""}
               settings={gameSettings}
@@ -125,35 +125,20 @@ export function PokemonMusicQuiz() {
             />
           </Grid.Col>
           <Grid.Col span={6} style={{ height: "100%" }}>
-            <Center style={{ width: "100%" }}>
-              <Paper shadow="sm" p="lg" radius="md" withBorder>
-                <Box style={{ display: "flex", justifyContent: "flex-end" }}>
-                  <Popover
-                    opened={settingsOpen}
-                    onClose={close}
-                    onDismiss={close}
-                    position="top"
-                    withArrow
-                    shadow="md"
-                  >
-                    <Popover.Target>
-                      <ActionIcon onClick={toggle}>
-                        <IconMusic size={20} />
-                      </ActionIcon>
-                    </Popover.Target>
-                    <Popover.Dropdown>
-                      <input
-                        type="range"
-                        min={0}
-                        max={100}
-                        value={volume}
-                        onChange={(e) =>
-                          setVolume(parseInt(e.target.value, 10))
-                        }
-                      />
-                    </Popover.Dropdown>
-                  </Popover>
-                </Box>
+            <Center style={{ width: "100%", height: "100%" }}>
+              <Paper
+                shadow="sm"
+                p="lg"
+                radius="md"
+                withBorder
+                style={{
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  width: "100%",
+                }}
+              >
                 {gameSettings?.started ? (
                   <MusicQuiz
                     settings={gameSettings}
@@ -187,7 +172,33 @@ export function PokemonMusicQuiz() {
               </Paper>
             </Center>
           </Grid.Col>
-          <Grid.Col span={2} style={{ height: "100%" }}></Grid.Col>
+          <Grid.Col span={3}>
+            <Box style={{ display: "flex", justifyContent: "flex-end" }}>
+              <Popover
+                opened={settingsOpen}
+                onClose={close}
+                onDismiss={close}
+                position="top"
+                withArrow
+                shadow="md"
+              >
+                <Popover.Target>
+                  <ActionIcon onClick={toggle}>
+                    <IconMusic size={20} />
+                  </ActionIcon>
+                </Popover.Target>
+                <Popover.Dropdown>
+                  <input
+                    type="range"
+                    min={0}
+                    max={100}
+                    value={volume}
+                    onChange={(e) => setVolume(parseInt(e.target.value, 10))}
+                  />
+                </Popover.Dropdown>
+              </Popover>
+            </Box>
+          </Grid.Col>
         </Grid>
       </AppShell.Main>
     </AppShell>

@@ -68,6 +68,7 @@ export function MusicQuiz(props: MusicQuizProps) {
 
   // Answer state
   const [answered, setAnswered] = useState(false);
+  const [answer, setAnswer] = useState<string | undefined>(undefined);
   const [isCorrect, setIsCorrect] = useState(false);
   const [correctAnswer, setCorrectAnswer] = useState<{
     title: string;
@@ -92,11 +93,11 @@ export function MusicQuiz(props: MusicQuizProps) {
 
   const handleAutocompleteSubmit = () => {
     if (answered) return;
-    handleAnswer(autocompleteValue);
+    handleSubmitAnswer(autocompleteValue);
   };
 
   // Submit answer to server
-  const handleAnswer = (answer: string | undefined) => {
+  const handleSubmitAnswer = (answer: string | undefined) => {
     if (answered) return;
 
     socket.emit("submitAnswer", {
@@ -104,6 +105,9 @@ export function MusicQuiz(props: MusicQuizProps) {
       answer: answer ?? null,
       timeRemaining,
     });
+
+    setAnswer(answer);
+    setAnswered(true);
   };
 
   const formatSongName = (song: { title: string; game: string }) => {
@@ -150,14 +154,9 @@ export function MusicQuiz(props: MusicQuizProps) {
       setBetweenRounds(false);
     };
 
-    const handleAnswerReceived = () => {
-      setAnswered(true);
-    };
-
     socket.on("roundStart", handleRoundStart);
     socket.on("roundEnd", handleRoundEnd);
     socket.on("gameOver", handleGameOver);
-    socket.on("answerReceived", handleAnswerReceived);
 
     // Request current round state in case we missed roundStart
     socket.emit("getCurrentRound", settings.code);
@@ -166,7 +165,6 @@ export function MusicQuiz(props: MusicQuizProps) {
       socket.off("roundStart", handleRoundStart);
       socket.off("roundEnd", handleRoundEnd);
       socket.off("gameOver", handleGameOver);
-      socket.off("answerReceived", handleAnswerReceived);
     };
   }, [
     settings.players,
@@ -219,12 +217,12 @@ export function MusicQuiz(props: MusicQuizProps) {
           Round {currentRound} / {settings.numberOfRounds}
         </Title>
         <Stack style={{
-            alignItems: "center",
+            flexDirection: "column",
             justifyContent: "center",
-            flexDirection: "row",
+            alignItems: "center",
+            overflow: "visible"
           }}>
-
-            <Box style={{ width: "100%"}}>
+            <Box>
               {isGameOver && (
                 <Box p="lg" bg="blue.1" style={{ marginBottom: "1rem" }}>
                   <Title order={3} ta="center">
@@ -242,16 +240,6 @@ export function MusicQuiz(props: MusicQuizProps) {
                   </Stack>
                 </Box>
               )}
-
-              {correctAnswer && (
-                <Box p="md" bg={isCorrect ? "green.1" : "red.1"} mb="md">
-                  <Text fw={500} c={isCorrect ? "green" : "red"}>
-                    {(isCorrect ? "✓ Correct!" : "✗ Wrong!") +
-                      ` The answer was: ${formatSongName(correctAnswer)}`}
-                  </Text>
-                </Box>
-              )}
-
               <MusicFrame
                 key={videoKey}
                 songLink={songLink}
@@ -298,9 +286,8 @@ export function MusicQuiz(props: MusicQuizProps) {
 
             {/* Answer Section */}
             {!isGameOver &&
-              !betweenRounds &&
-              (!answered ? (
-                <Box style={{ position: "relative"}}>
+              (
+                <Box style={{ width: "100%", position: "relative"}}>
                   <Text fw={500} mb="sm">
                     What song is this?
                   </Text>
@@ -308,7 +295,10 @@ export function MusicQuiz(props: MusicQuizProps) {
                     <SongMultipleChoice
                       options={multiChoiceOptions}
                       answered={answered}
-                      handleAnswer={handleAnswer}
+                      answer={answer || ""}
+                      betweenRounds={betweenRounds}
+                      handleAnswer={handleSubmitAnswer}
+                      correctAnswer={correctAnswer ? formatSongName(correctAnswer) : null}
                     />
                   ) : (
                     <SongAutocomplete
@@ -320,11 +310,7 @@ export function MusicQuiz(props: MusicQuizProps) {
                     />
                   )}
                 </Box>
-              ) : (
-                <Text fw={500} ta="center">
-                  {"Answer submitted! Waiting for other players..."}
-                </Text>
-              ))}
+              )}
           </Stack>
       </>
     )

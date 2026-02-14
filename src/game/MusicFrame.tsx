@@ -68,35 +68,35 @@ export function MusicFrame(props: MusicFrameProps) {
   }, [songLink, isReady]);
 
   return (
-    <AspectRatio ratio={16 / 9} style={{ pointerEvents: "none", width: "100%" }}>
-        <Box
-          ref={playerContainerRef}
-          style={{
-            width: "100%",
-            height: "100%",
-            position: "absolute",
-            top: 0,
-            left: 0,
-            opacity: showVideo ? 1 : 0,
-            pointerEvents: "none",
-          }}
-        />
-
-        {/* Show gif overlay on normal/hard during rounds */}
-        {!showVideo && (
+    <AspectRatio ratio={16 / 9} style={{ pointerEvents: "none" }}>
+      <Box
+        ref={showVideo ? playerContainerRef : null}
+        style={{
+          width: "100%",
+          height: "100%",
+          position: "relative",
+          top: 0,
+          left: 0,
+          pointerEvents: "none",
+        }}
+      >
+        {!showVideo ? (
           <img
             src="/gifs/jigglypuff_singing.gif"
             alt="Jigglypuff singing"
             style={{
               width: "100%",
               height: "100%",
-              objectFit: "contain",
-              position: "absolute",
-              top: 0,
-              left: 0,
+              objectFit: "cover",
             }}
           />
+        ) : (
+          <div
+            ref={playerContainerRef}
+            style={{ width: "100%", height: "100%" }}
+          ></div>
         )}
+      </Box>
     </AspectRatio>
   );
 }

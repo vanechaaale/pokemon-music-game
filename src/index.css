@@ -56,7 +56,6 @@ button:focus-visible {
 .mantine-Paper-root {
   padding: 1em;
   border-radius: 8px;
-  /* margin-left: '500px'; */
 }
 
 @media (prefers-color-scheme: dark) {
