@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { loadYouTubeAPI, parseYouTubeUrl } from "../util/utils";
+import { loadYouTubeAPI, parseYouTubeUrl, getRandomPokemonSingGif } from "../util/utils";
 import { AspectRatio, Box } from "@mantine/core";
 
 interface MusicFrameProps {
@@ -17,6 +17,17 @@ export function MusicFrame(props: MusicFrameProps) {
   const playerRef = useRef<YT.Player | null>(null);
   const [isReady, setIsReady] = useState(false);
   const initialSongRef = useRef(songLink);
+  const [gifUrl, setGifUrl] = useState<string>("");
+
+  // Fetch a random Giphy GIF each time the song changes
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const url = await getRandomPokemonSingGif();
+      if (!cancelled) setGifUrl(url);
+    })();
+    return () => { cancelled = true; };
+  }, [songLink]);
 
   useEffect(() => {
     let isMounted = true;
@@ -87,8 +98,8 @@ export function MusicFrame(props: MusicFrameProps) {
         />
         {!showVideo && (
           <img
-            src="/gifs/jigglypuff_singing.gif"
-            alt="Jigglypuff singing"
+            src={gifUrl}
+            alt="Pokémon singing"
             style={{
               position: "absolute",
               inset: 0,

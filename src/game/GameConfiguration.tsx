@@ -10,6 +10,7 @@ import {
   Grid,
   GridCol,
   Divider,
+  Tooltip,
 } from "@mantine/core";
 import { useCallback, useState } from "react";
 import {
@@ -73,9 +74,9 @@ export function GameConfiguration({
     "theme",
   ]);
   const [musicSources, setMusicSources] = useState<MusicSource[]>([
-    "red_blue",
-    "gold_silver",
     "ruby_sapphire",
+    "heartgold_soulsilver",
+    "diamond_pearl",
   ]);
   const [numberOfRounds, setNumberOfRounds] = useState(10);
 
@@ -125,7 +126,37 @@ export function GameConfiguration({
             }}
           >
             <Box style={{ marginBottom: "1rem" }}>
-              <Text mb="xs">Difficulty</Text>
+              <Box
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: "0.25rem",
+                  alignSelf: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Text mb="xs">Difficulty</Text>
+                <Tooltip
+                  label={
+                    difficulty === "easy"
+                      ? "Multiple choice with video hints."
+                      : difficulty === "normal"
+                        ? "Multiple choice. No video hints."
+                        : "Autocomplete only. No hints."
+                  }
+                  position="right"
+                  withArrow
+                >
+                  <Text
+                    variant="link"
+                    c="blue"
+                    style={{ display: "inline-block" }}
+                  >
+                    (?)
+                  </Text>
+                </Tooltip>
+              </Box>
+
               <SegmentedControl
                 value={difficulty}
                 onChange={(value) =>
@@ -151,8 +182,8 @@ export function GameConfiguration({
                 step={1}
               />
             </Box>
-            <Box>
-              <Text mb="xs">Round Duration: {levelDuration} seconds</Text>
+            <Box style={{ width: "50%" }}>
+              <Text mb="xs">Round Duration</Text>
               <Slider
                 value={levelDuration}
                 onChange={setLevelDuration}

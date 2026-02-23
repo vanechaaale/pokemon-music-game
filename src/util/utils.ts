@@ -1,5 +1,40 @@
 import { io } from "socket.io-client";
 export const socket = io(import.meta.env.VITE_SOCKET_URL || "http://localhost:3001");
+const GIPHY_API_KEY = import.meta.env.VITE_GIPHY_API_KEY;
+const GIPHY_SEARCH_ENDPOINT = "https://api.giphy.com/v1/gifs/search";
+const FALLBACK_GIF = "/gifs/jigglypuff_singing.gif";
+
+export async function getRandomPokemonSingGif(): Promise<string> {
+  if (!GIPHY_API_KEY) {
+    console.warn("VITE_GIPHY_API_KEY is not set, using fallback GIF");
+    return FALLBACK_GIF;
+  }
+
+  try {
+    const query = "@pokemon sing";
+    const limit = 5;
+    const url = `${GIPHY_SEARCH_ENDPOINT}?api_key=${GIPHY_API_KEY}&q=${encodeURIComponent(query)}&limit=${limit}&rating=g`;
+
+    const response = await fetch(url);
+    if (!response.ok) {
+      console.error("Giphy API request failed:", response.status);
+      return FALLBACK_GIF;
+    }
+
+    const data = await response.json();
+    const gifs = data.data;
+
+    if (!gifs || gifs.length === 0) {
+      return FALLBACK_GIF;
+    }
+
+    const randomIndex = Math.floor(Math.random() * gifs.length);
+    return gifs[randomIndex].images.original.url;
+  } catch (error) {
+    console.error("Failed to fetch Giphy GIF:", error);
+    return FALLBACK_GIF;
+  }
+}
 
 export const MUSIC_SELECTIONS = [
                 { value: "red_blue", label: "Red/Blue" },
@@ -62,7 +97,7 @@ export function getYouTubeEmbedUrl(link: string): string {
     const minuteMatch = timeParam.match(/(\d+)m/);
     const secondMatch = timeParam.match(/(\d+)s/);
     if (minuteMatch) startSeconds += parseInt(minuteMatch[1]) * 60;
-    if (secondMatch) startSeconds += parseInt(secondMatch[1]);
+    if (secondMatch) startSeconds += parseInt(secondMatch[1]) + 2;
   }
   
   return `https://www.youtube.com/embed/${videoId}?start=${startSeconds}&autoplay=1`;
