@@ -99,7 +99,7 @@ export function PokemonMusicQuiz() {
     if (phase === "LOBBY" && !isHost) {
       let cancelled = false;
       (async () => {
-        const url = await getRandomGiphy("@pokemon sing");
+        const url = await getRandomGiphy("@pokemon wait");
         if (!cancelled) setGifUrl(url);
       })();
       return () => {
