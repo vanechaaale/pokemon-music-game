@@ -1,5 +1,4 @@
 import {
-  Stack,
   SegmentedControl,
   Slider,
   MultiSelect,
@@ -8,9 +7,16 @@ import {
   Title,
   Box,
   Button,
+  Grid,
+  GridCol,
+  Divider,
 } from "@mantine/core";
 import { useCallback, useState } from "react";
-import type { MusicSource, SongType } from "../util/utils";
+import {
+  MUSIC_SELECTIONS,
+  type MusicSource,
+  type SongType,
+} from "../util/utils";
 
 export interface Player {
   id: string;
@@ -96,29 +102,30 @@ export function GameConfiguration({
   ]);
   return (
     !started && (
-      <>
+      <Box
+        style={{
+          borderRadius: "8px",
+          padding: "1rem",
+          backgroundColor: "white",
+          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+        }}
+      >
         <Title order={3} mb="md">
           Game Configuration
         </Title>
+        <Divider mb="md" />
         <Text mb="md">Lobby ID: {settings?.code || "N/A"}</Text>
-        <Stack
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-            flexDirection: "row",
-          }}
-        >
-          <Box
+        <Grid>
+          <GridCol
+            span={6}
             style={{
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
             }}
           >
-            <Box style={{ marginBottom: "1rem", width: "100%" }}>
-              <Text fw={500} mb="xs">
-                Difficulty
-              </Text>
+            <Box style={{ marginBottom: "1rem" }}>
+              <Text mb="xs">Difficulty</Text>
               <SegmentedControl
                 value={difficulty}
                 onChange={(value) =>
@@ -132,26 +139,20 @@ export function GameConfiguration({
                 fullWidth
               />
             </Box>
-            <Box
-              style={{ width: "50%", overflow: "hidden", marginBottom: "1rem" }}
-            >
-              <Text fw={500} mb="xs">
-                Rounds
-              </Text>
+            <Box style={{ width: "40%", marginBottom: "1rem" }}>
+              <Text mb="xs">Rounds</Text>
               <NumberInput
                 value={numberOfRounds}
                 onChange={(value) =>
                   setNumberOfRounds(typeof value === "number" ? value : 1)
                 }
                 min={1}
-                max={50}
+                max={100}
                 step={1}
               />
             </Box>
             <Box>
-              <Text fw={500} mb="xs">
-                Round Duration: {levelDuration} seconds
-              </Text>
+              <Text mb="xs">Round Duration: {levelDuration} seconds</Text>
               <Slider
                 value={levelDuration}
                 onChange={setLevelDuration}
@@ -165,9 +166,9 @@ export function GameConfiguration({
                 ]}
               />
             </Box>
-          </Box>
-
-          <Box
+          </GridCol>
+          <GridCol
+            span={6}
             style={{
               display: "flex",
               flexDirection: "column",
@@ -178,18 +179,7 @@ export function GameConfiguration({
             <MultiSelect
               value={musicSources}
               onChange={(value) => setMusicSources(value as MusicSource[])}
-              data={[
-                { value: "red_blue", label: "Red/Blue" },
-                { value: "gold_silver", label: "Gold/Silver" },
-                { value: "theme_songs", label: "Anime" },
-                { value: "ruby_sapphire", label: "Ruby/Sapphire" },
-                { value: "diamond_pearl", label: "Diamond/Pearl" },
-                { value: "firered_leafgreen", label: "FireRed/LeafGreen" },
-                {
-                  value: "heartgold_soulsilver",
-                  label: "HeartGold/SoulSilver",
-                },
-              ]}
+              data={MUSIC_SELECTIONS}
               placeholder="Select music sources"
               clearable
               style={{ maxWidth: "50%" }}
@@ -205,13 +195,12 @@ export function GameConfiguration({
               clearable
               style={{ maxWidth: "50%" }}
             />
-          </Box>
-        </Stack>
-
+          </GridCol>
+        </Grid>
         <Button onClick={startGame} mt="xl" size="md">
           Start Game
         </Button>
-      </>
+      </Box>
     )
   );
 }

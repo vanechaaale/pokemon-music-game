@@ -1,10 +1,9 @@
-import { Box, Button, Paper, TextInput, Text, AppShell } from "@mantine/core";
+import { Box, Button, Paper, TextInput, Text, Title } from "@mantine/core";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { socket } from "./util/utils";
 import { notifications } from "@mantine/notifications";
 import "@mantine/notifications/styles.css";
-import Header from "./Header";
 
 export function Home() {
   const navigate = useNavigate();
@@ -66,45 +65,37 @@ export function Home() {
   };
 
   return (
-     <AppShell header={{ height: "5%" }}
-          navbar={{
-            width: "20%",
-            breakpoint: 'sm',
-          }}>
-          <Header />
-          <Box
-            style={{
-              display: "flex",
-              gap: "1rem",
-              marginTop: "2rem",
-              justifyContent: "center",
-              flexDirection: "column",
-              alignItems: "center",
-            }}
-          >
-          <Text> {`Welcome to Pokemon Music Quiz!`}</Text>
-          <Text>
-            {`Test your knowledge of Pokemon music across all generations. Can you
+    <Box
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: "1rem",
+        marginTop: "2rem",
+      }}
+    >
+      <Title> {`Welcome to Pokemon Music Quiz!`}</Title>
+      <Text>
+        {`Test your knowledge of Pokemon music across all generations. Can you
             name the song from just a few seconds of music?`}
-          </Text>
-            <Paper p="md" withBorder>
-              <TextInput
-                label="Lobby ID"
-                placeholder="Enter Lobby ID (e.g. ABCD)"
-                value={gameCode}
-                onChange={(e) => setGameCode(e.currentTarget.value)}
-                style={{ marginBottom: "1rem" }}
-              />
-              <Button
-                onClick={handleJoinLobby}
-                disabled={!gameCode.trim()}
-                style={{ marginRight: "1rem" }}
-              >
-                Join Lobby
-              </Button>
-              <Button onClick={createGame}>New Lobby</Button>
-            </Paper>
-          </Box>
-      </AppShell>
+      </Text>
+      <Paper p="md" withBorder>
+        <TextInput
+          label="Lobby ID"
+          placeholder="Enter Lobby ID (e.g. ABCD)"
+          value={gameCode}
+          onChange={(e) => setGameCode(e.currentTarget.value)}
+          style={{ marginBottom: "1rem" }}
+        />
+        <Button
+          onClick={handleJoinLobby}
+          disabled={!gameCode.trim()}
+          style={{ marginRight: "1rem" }}
+        >
+          Join Lobby
+        </Button>
+        <Button onClick={createGame}>New Lobby</Button>
+      </Paper>
+    </Box>
   );
 }

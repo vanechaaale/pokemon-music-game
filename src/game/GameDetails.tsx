@@ -1,8 +1,17 @@
-import { Box, Grid, Popover, Stack, Text, TextInput } from "@mantine/core";
+import {
+  ActionIcon,
+  Box,
+  Grid,
+  Popover,
+  Stack,
+  Text,
+  TextInput,
+} from "@mantine/core";
 import type { GameSettings, Player } from "./GameConfiguration";
 import { socket } from "../util/utils";
 import { useMemo } from "react";
 import { useDisclosure } from "@mantine/hooks";
+import { IconMusic } from "@tabler/icons-react";
 
 interface GameDetailsProps {
   lobbyId: string;
@@ -19,13 +28,24 @@ interface GameDetailsProps {
     wasCorrect: boolean;
     answer: string | null;
   }[];
+  playerVolume: number;
+  setPlayerVolume: (volume: number) => void;
 }
 
 export function GameDetails(props: GameDetailsProps) {
-  const { lobbyId, settings, roundResults, phase } = props;
-  const [playerIconOpen, { close, toggle }] = useDisclosure(false);
+  const {
+    lobbyId,
+    settings,
+    roundResults,
+    phase,
+    playerVolume,
+    setPlayerVolume,
+  } = props;
+  const [playerIconOpen, { toggle: togglePlayerIcon, close: closePlayerIcon }] =
+    useDisclosure(false);
+  const [settingsOpen, { toggle: toggleSettings, close: closeSettings }] =
+    useDisclosure(false);
 
-  console.log("phase:", phase);
   const iconOptions = useMemo(() => {
     const icons = [];
     for (let i = 1; i <= 151; i++) {
@@ -38,174 +58,196 @@ export function GameDetails(props: GameDetailsProps) {
   }, []);
 
   return (
-      <Stack 
-       style={{
+    <Stack
+      style={{
         padding: "1rem",
-        align: "flex-start",
-        justify: "flex-start",
-       }}
+        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+        height: "100%",
+        display: "flex",
+        overflow: "auto",
+      }}
+    >
+      <Popover
+        opened={settingsOpen}
+        onClose={closeSettings}
+        onDismiss={closeSettings}
+        withArrow
+        shadow="md"
       >
-        <Text size="lg" style={{ marginBottom: "0.5rem" }} fw={500}>
-          {!settings?.started ? "Players:" : "Leaderboard:"}
-        </Text>
-        {settings?.players.map((player, index) => (
-          <Box
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: "1rem",
-              marginBottom: "0.5rem",
-            }}
+        <Popover.Target>
+          <ActionIcon
+            onClick={toggleSettings}
+            style={{ float: "right", marginTop: "0.5rem" }}
           >
-            <Popover
-              opened={
-                playerIconOpen &&
-                !settings.started &&
-                player.socketId === socket.id
-              }
-              onClose={close}
-              onDismiss={close}
-              position="right-start"
-              withArrow
-              shadow="md"
-              width="50vh"
-            >
-              <Popover.Target>
-                <img
-                  onClick={() => {
-                    if (!settings.started && player.socketId === socket.id) {
-                      toggle();
-                    }
-                  }}
-                  key={player.id || index}
-                  src={player.icon}
-                  alt="Profile Icon"
-                  width={64}
-                  height={64}
-                  style={{
-                    display: "block",
-                    borderRadius: "50%",
-                    outline: "black solid 1px",
-                    cursor:
-                      player.socketId === socket.id ? "pointer" : "default",
-                  }}
-                  className={
-                    player.socketId === socket.id ? "hover-outline" : ""
-                  }
-                />
-              </Popover.Target>
-              <Popover.Dropdown>
-                <Text mb="sm" fw={500}>
-                  Change Icon:
-                </Text>
-                <Grid
-                  style={{ overflowY: "scroll", maxHeight: "42vh", padding: 1 }}
-                >
-                  {iconOptions.map((option) => (
-                    <Grid.Col
-                      span={{ xs: 6, sm: 4, md: 3, lg: 2 }}
-                      key={option.value}
-                      style={{ display: "flex", justifyContent: "center" }}
-                    >
-                      <img
-                        key={option.value}
-                        src={option.value}
-                        alt={option.label}
-                        width={48}
-                        height={48}
-                        style={{
-                          cursor: "pointer",
-                          borderRadius: "50%",
-                          outline: "black solid 1px",
-                        }}
-                        className="hover-outline"
-                        onClick={() => {
-                          socket.emit("playerEdit", {
-                            code: lobbyId,
-                            player: {
-                              ...player,
-                              icon: option.value,
-                            },
-                          });
-                          close();
-                        }}
-                      />
-                    </Grid.Col>
-                  ))}
-                </Grid>
-              </Popover.Dropdown>
-            </Popover>
-            {player.socketId === socket.id && !settings.started ? (
-              <TextInput
-                key={player.id || index}
-                defaultValue={player.name}
-                onBlur={(e) => {
-                  const newName = e.currentTarget.value;
-                  if (newName !== player.name) {
-                    socket.emit("playerEdit", {
-                      code: lobbyId,
-                      player: {
-                        ...player,
-                        name: newName,
-                      },
-                    });
+            <IconMusic size={20} />
+          </ActionIcon>
+        </Popover.Target>
+        <Popover.Dropdown>
+          <input
+            type="range"
+            min={0}
+            max={100}
+            value={playerVolume}
+            onChange={(e) => setPlayerVolume(parseInt(e.target.value, 10))}
+          />
+        </Popover.Dropdown>
+      </Popover>
+      <Text size="lg">{!settings?.started ? "Players:" : "Leaderboard:"}</Text>
+      {settings?.players.map((player, index) => (
+        <Box
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            gap: "1rem",
+            marginBottom: "0.5rem",
+          }}
+        >
+          <Popover
+            opened={
+              playerIconOpen &&
+              !settings.started &&
+              player.socketId === socket.id
+            }
+            onClose={closePlayerIcon}
+            onDismiss={closePlayerIcon}
+            position="right-start"
+            withArrow
+            shadow="md"
+            width="50vh"
+          >
+            <Popover.Target>
+              <img
+                onClick={() => {
+                  if (!settings.started && player.socketId === socket.id) {
+                    togglePlayerIcon();
                   }
                 }}
-                placeholder="Enter your name"
-                size="md"
+                key={player.id || index}
+                src={player.icon}
+                alt="Profile Icon"
+                width={64}
+                height={64}
+                style={{
+                  display: "block",
+                  borderRadius: "50%",
+                  outline: "black solid 1px",
+                  cursor: player.socketId === socket.id ? "pointer" : "default",
+                }}
+                className={player.socketId === socket.id ? "hover-outline" : ""}
               />
-            ) : (
-              <>
-                <Text
-                  key={player.id || index}
-                  c={player.socketId === socket.id ? "blue" : "black"}
-                >
-                  {player.name}
-                </Text>
-
-                {phase === "REVIEW" && roundResults && (
-                  <>
-                    <Box
+            </Popover.Target>
+            <Popover.Dropdown>
+              <Text mb="sm" fw={500}>
+                Change Icon:
+              </Text>
+              <Grid
+                style={{ overflowY: "scroll", maxHeight: "42vh", padding: 1 }}
+              >
+                {iconOptions.map((option) => (
+                  <Grid.Col
+                    span={{ xs: 6, sm: 4, md: 3, lg: 2 }}
+                    key={option.value}
+                    style={{ display: "flex", justifyContent: "center" }}
+                  >
+                    <img
+                      key={option.value}
+                      src={option.value}
+                      alt={option.label}
+                      width={48}
+                      height={48}
                       style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 2,
+                        cursor: "pointer",
+                        borderRadius: "50%",
+                        outline: "black solid 1px",
                       }}
-                    >
-                      <Text
-                        c={
-                          roundResults.find(
-                            (result) => result.playerId === player.id,
-                          )?.wasCorrect
-                            ? "green"
-                            : "red"
-                        }
-                        size="sm"
-                      >
-                        {roundResults.find(
+                      className="hover-outline"
+                      onClick={() => {
+                        socket.emit("playerEdit", {
+                          code: lobbyId,
+                          player: {
+                            ...player,
+                            icon: option.value,
+                          },
+                        });
+                        closePlayerIcon();
+                      }}
+                    />
+                  </Grid.Col>
+                ))}
+              </Grid>
+            </Popover.Dropdown>
+          </Popover>
+          {player.socketId === socket.id && !settings.started ? (
+            <TextInput
+              key={player.id || index}
+              defaultValue={player.name}
+              onBlur={(e) => {
+                const newName = e.currentTarget.value;
+                if (newName !== player.name) {
+                  socket.emit("playerEdit", {
+                    code: lobbyId,
+                    player: {
+                      ...player,
+                      name: newName,
+                    },
+                  });
+                }
+              }}
+              placeholder="Enter your name"
+              size="md"
+            />
+          ) : (
+            <>
+              <Text
+                key={player.id || index}
+                c={player.socketId === socket.id ? "blue" : "black"}
+              >
+                {player.name}
+              </Text>
+
+              {phase === "REVIEW" && roundResults && (
+                <>
+                  <Box
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 2,
+                    }}
+                  >
+                    <Text
+                      c={
+                        roundResults.find(
                           (result) => result.playerId === player.id,
                         )?.wasCorrect
-                          ? `+${roundResults.find((result) => result.playerId === player.id)?.pointsEarned}`
-                          : "+0"}
-                      </Text>
-                    </Box>
-                  </>
-                )}
-                {settings?.started && (
-                  <Text size="sm" c="dimmed" style={{ marginLeft: "auto" }}>
-                    {
-                      roundResults?.find(
+                          ? "green"
+                          : "red"
+                      }
+                      size="sm"
+                    >
+                      {roundResults.find(
                         (result) => result.playerId === player.id,
-                      )?.score
-                    }
-                  </Text>
-                )}
-              </>
-            )}
-          </Box>
-        )) || <Text>No players joined yet</Text>}
-      </Stack>
+                      )?.wasCorrect
+                        ? `+${roundResults.find((result) => result.playerId === player.id)?.pointsEarned}`
+                        : "+0"}
+                    </Text>
+                  </Box>
+                </>
+              )}
+              {settings?.started && (
+                <Text size="sm" c="dimmed" style={{ marginLeft: "auto" }}>
+                  {
+                    roundResults?.find(
+                      (result) => result.playerId === player.id,
+                    )?.score
+                  }
+                </Text>
+              )}
+            </>
+          )}
+        </Box>
+      )) || <Text>No players joined yet</Text>}
+    </Stack>
   );
 }
 

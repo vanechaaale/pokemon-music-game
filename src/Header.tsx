@@ -6,13 +6,17 @@ export function Header() {
 
   return (
     <AppShell.Header>
-        <Text 
-          style={{ cursor: "pointer", float: "left", paddingLeft: "1rem", zIndex: 1000 }}
-          onClick={() => navigate("/")}
-          fw={500}
-        >
-          Pokemon Music Quiz
-        </Text>
+      <Text
+        style={{
+          cursor: "pointer",
+          float: "left",
+          paddingLeft: "1rem",
+        }}
+        onClick={() => navigate("/")}
+        fw={500}
+      >
+        Pokemon Music Quiz
+      </Text>
     </AppShell.Header>
   );
 }

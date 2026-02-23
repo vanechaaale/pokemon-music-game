@@ -70,31 +70,34 @@ export function MusicFrame(props: MusicFrameProps) {
   return (
     <AspectRatio ratio={16 / 9} style={{ pointerEvents: "none" }}>
       <Box
-        ref={showVideo ? playerContainerRef : null}
         style={{
           width: "100%",
           height: "100%",
           position: "relative",
-          top: 0,
-          left: 0,
           pointerEvents: "none",
         }}
       >
-        {!showVideo ? (
+        <div
+          ref={playerContainerRef}
+          style={{
+            width: "100%",
+            height: "100%",
+            visibility: showVideo ? "visible" : "hidden",
+          }}
+        />
+        {!showVideo && (
           <img
             src="/gifs/jigglypuff_singing.gif"
             alt="Jigglypuff singing"
             style={{
+              position: "absolute",
+              inset: 0,
               width: "100%",
               height: "100%",
               objectFit: "cover",
+              zIndex: 1,
             }}
           />
-        ) : (
-          <div
-            ref={playerContainerRef}
-            style={{ width: "100%", height: "100%" }}
-          ></div>
         )}
       </Box>
     </AspectRatio>

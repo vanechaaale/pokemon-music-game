@@ -49,3 +49,7 @@ export function loadSongs(musicSources, songTypes) {
   // Filter by song types
   return allSongs.filter((song) => songTypes.includes(song.type));
 }
+
+export function obfuscateSongLink(link) {
+  return Buffer.from(link.split("").reverse().join("")).toString("base64");
+}

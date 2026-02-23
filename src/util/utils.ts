@@ -1,6 +1,19 @@
 import { io } from "socket.io-client";
 export const socket = io(import.meta.env.VITE_SOCKET_URL || "http://localhost:3001");
 
+export const MUSIC_SELECTIONS = [
+                { value: "red_blue", label: "Red/Blue" },
+                { value: "gold_silver", label: "Gold/Silver" },
+                { value: "theme_songs", label: "Anime" },
+                { value: "ruby_sapphire", label: "Ruby/Sapphire" },
+                { value: "diamond_pearl", label: "Diamond/Pearl" },
+                { value: "firered_leafgreen", label: "FireRed/LeafGreen" },
+                {
+                  value: "heartgold_soulsilver",
+                  label: "HeartGold/SoulSilver",
+                },
+];
+
 export const MusicSource = {
   RedBlue: 'Red/Blue',
   GoldSilver: 'Gold/Silver',
@@ -53,6 +66,10 @@ export function getYouTubeEmbedUrl(link: string): string {
   }
   
   return `https://www.youtube.com/embed/${videoId}?start=${startSeconds}&autoplay=1`;
+}
+
+export function deobfuscateSongLink(encoded: string): string {
+  return atob(encoded).split("").reverse().join("");
 }
 
 export function parseYouTubeUrl(link: string): { videoId: string; startSeconds: number } {

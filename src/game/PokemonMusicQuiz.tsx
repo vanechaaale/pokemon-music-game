@@ -1,15 +1,4 @@
-import {
-  ActionIcon,
-  AppShell,
-  Box,
-  Center,
-  Container,
-  Drawer,
-  Grid,
-  Paper,
-  Popover,
-  Stack,
-} from "@mantine/core";
+import { Box, Grid, GridCol } from "@mantine/core";
 import { useParams } from "react-router-dom";
 import GameConfiguration, { type GameSettings } from "./GameConfiguration";
 import MusicQuiz from "./MusicQuiz";
@@ -17,9 +6,6 @@ import { useState, useEffect, useCallback } from "react";
 import { GameDetails } from "./GameDetails";
 import { socket } from "../util/utils";
 import { notifications } from "@mantine/notifications";
-import { useDisclosure } from "@mantine/hooks";
-import { IconMusic } from "@tabler/icons-react";
-import Header from "../Header";
 
 export interface RoundResult {
   playerId: string;
@@ -107,100 +93,71 @@ export function PokemonMusicQuiz() {
       socket.off("roundEnd", handleRoundEnd);
     };
   }, []);
-  const [settingsOpen, { close, toggle }] = useDisclosure(false);
 
   return (
-    <AppShell header={{ height: "5%" }}>
-      <Header />
-      <AppShell.Main>
-        <Grid style={{ height: "100%" }}>
-          <Grid.Col span={3} style={{ height: "100%" }}>
-            <GameDetails
-              lobbyId={lobbyId || ""}
-              settings={gameSettings}
-              currentPlayer={currentPlayer}
-              isHost={isHost}
-              phase={phase}
-              roundResults={roundResults}
+    <Grid>
+      <GridCol
+        span={2}
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          height: "100%",
+          width: "100%",
+          boxSizing: "border-box",
+        }}
+      >
+        <GameDetails
+          lobbyId={lobbyId || ""}
+          settings={gameSettings}
+          currentPlayer={currentPlayer}
+          isHost={isHost}
+          phase={phase}
+          roundResults={roundResults}
+          playerVolume={volume}
+          setPlayerVolume={setVolume}
+        />
+      </GridCol>
+      <GridCol
+        span={10}
+        style={{
+          position: "absolute",
+          left: gameSettings?.started ? "10%" : "17%",
+          height: "90%",
+          width: "100%",
+        }}
+      >
+        {gameSettings?.started ? (
+          <MusicQuiz
+            settings={gameSettings}
+            score={score}
+            volume={volume}
+            onUpdateScore={setScore}
+            onUpdatePhase={setPhase}
+          />
+        ) : isHost ? (
+          <GameConfiguration
+            settings={gameSettings || undefined}
+            started={gameSettings?.started || false}
+            onStartGame={startGame}
+          />
+        ) : (
+          <Box
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              textAlign: "center",
+            }}
+          >
+            <img
+              style={{ marginBottom: "10px" }}
+              src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExMXpuNGk0MHppc3R4eTY3NTZvejN0enN6aGpmbnZ1YjZybWNybm55ciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ng88DijbQOzq8nPJmv/giphy.gif"
             />
-          </Grid.Col>
-          <Grid.Col span={6} style={{ height: "100%" }}>
-            <Center style={{ width: "100%", height: "100%" }}>
-              <Paper
-                shadow="sm"
-                p="lg"
-                radius="md"
-                withBorder
-                style={{
-                  height: "100%",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  width: "100%",
-                }}
-              >
-                {gameSettings?.started ? (
-                  <MusicQuiz
-                    settings={gameSettings}
-                    score={score}
-                    volume={volume}
-                    onUpdateScore={setScore}
-                    onUpdatePhase={setPhase}
-                  />
-                ) : isHost ? (
-                  <GameConfiguration
-                    settings={gameSettings || undefined}
-                    started={gameSettings?.started || false}
-                    onStartGame={startGame}
-                  />
-                ) : (
-                  <Box
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      textAlign: "center",
-                    }}
-                  >
-                    <img
-                      style={{ marginBottom: "10px" }}
-                      src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExMXpuNGk0MHppc3R4eTY3NTZvejN0enN6aGpmbnZ1YjZybWNybm55ciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ng88DijbQOzq8nPJmv/giphy.gif"
-                    />
-                    Waiting for host to start ...
-                  </Box>
-                )}
-              </Paper>
-            </Center>
-          </Grid.Col>
-          <Grid.Col span={3}>
-            <Box style={{ display: "flex", justifyContent: "flex-end" }}>
-              <Popover
-                opened={settingsOpen}
-                onClose={close}
-                onDismiss={close}
-                position="top"
-                withArrow
-                shadow="md"
-              >
-                <Popover.Target>
-                  <ActionIcon onClick={toggle}>
-                    <IconMusic size={20} />
-                  </ActionIcon>
-                </Popover.Target>
-                <Popover.Dropdown>
-                  <input
-                    type="range"
-                    min={0}
-                    max={100}
-                    value={volume}
-                    onChange={(e) => setVolume(parseInt(e.target.value, 10))}
-                  />
-                </Popover.Dropdown>
-              </Popover>
-            </Box>
-          </Grid.Col>
-        </Grid>
-      </AppShell.Main>
-    </AppShell>
+            Waiting for host to start ...
+          </Box>
+        )}
+      </GridCol>
+    </Grid>
   );
 }

@@ -2,7 +2,7 @@ import express from "express";
 import http from "http";
 import { Server } from "socket.io";
 import { v4 as uuidv4 } from "uuid";
-import { generateCode, shuffleArray, loadSongs } from "./utils/utils.js";
+import { generateCode, shuffleArray, loadSongs, obfuscateSongLink } from "./utils/utils.js";
 const PORT = process.env.PORT || 3001;
 
 const app = express();
@@ -74,7 +74,7 @@ function startRound(game) {
     round: game.round,
     totalRounds: game.numberOfRounds,
     song: {
-      link: selectedSong.link,
+      link: obfuscateSongLink(selectedSong.link),
       type: selectedSong.type,
       game: selectedSong.game,
       // NOTE: title is intentionally omitted to prevent cheating
@@ -267,7 +267,7 @@ io.on("connection", (socket) => {
         round: game.round,
         totalRounds: game.numberOfRounds,
         song: {
-          link: game.currentSong.link,
+          link: obfuscateSongLink(game.currentSong.link),
           type: game.currentSong.type,
           game: game.currentSong.game,
         },
