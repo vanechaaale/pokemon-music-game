@@ -39,14 +39,12 @@ interface GameOverData {
 
 interface MusicQuizProps {
   settings: GameSettings;
-  score: number;
   volume: number;
-  onUpdateScore: (newScore: number) => void;
   onUpdatePhase: (newPhase: GameSettings["phase"]) => void;
 }
 
 export function MusicQuiz(props: MusicQuizProps) {
-  const { settings, score, onUpdateScore, volume, onUpdatePhase } = props;
+  const { settings, volume, onUpdatePhase } = props;
 
   // Round state from server
   const [currentRound, setCurrentRound] = useState(1);
@@ -136,7 +134,6 @@ export function MusicQuiz(props: MusicQuizProps) {
       );
       if (myResult) {
         setIsCorrect(myResult.wasCorrect);
-        onUpdateScore(myResult.score);
       }
     };
 
@@ -158,13 +155,7 @@ export function MusicQuiz(props: MusicQuizProps) {
       socket.off("roundEnd", handleRoundEnd);
       socket.off("gameOver", handleGameOver);
     };
-  }, [
-    settings.players,
-    settings.code,
-    onUpdateScore,
-    settings.levelDuration,
-    onUpdatePhase,
-  ]);
+  }, [settings.players, settings.code, settings.levelDuration, onUpdatePhase]);
 
   useEffect(() => {
     if (betweenRounds || timeRemaining <= 0 || isGameOver) return;

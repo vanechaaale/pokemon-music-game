@@ -20,7 +20,6 @@ export interface RoundResult {
 export function PokemonMusicQuiz() {
   const { lobbyId } = useParams<{ lobbyId: string }>();
   const [gameSettings, setGameSettings] = useState<GameSettings | null>(null);
-  const [score, setScore] = useState(0);
   const [roundResults, setRoundResults] = useState<RoundResult[]>([]);
   const currentPlayer =
     gameSettings?.players.find((p) => p.socketId === socket.id) || null;
@@ -130,9 +129,7 @@ export function PokemonMusicQuiz() {
         {gameSettings?.started ? (
           <MusicQuiz
             settings={gameSettings}
-            score={score}
             volume={volume}
-            onUpdateScore={setScore}
             onUpdatePhase={setPhase}
           />
         ) : isHost ? (
