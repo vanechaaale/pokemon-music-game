@@ -4,15 +4,14 @@ const GIPHY_API_KEY = import.meta.env.VITE_GIPHY_API_KEY;
 const GIPHY_SEARCH_ENDPOINT = "https://api.giphy.com/v1/gifs/search";
 const FALLBACK_GIF = "/gifs/jigglypuff_singing.gif";
 
-export async function getRandomPokemonSingGif(): Promise<string> {
+export async function getRandomGiphy(query: string): Promise<string> {
   if (!GIPHY_API_KEY) {
     console.warn("VITE_GIPHY_API_KEY is not set, using fallback GIF");
     return FALLBACK_GIF;
   }
 
   try {
-    const query = "@pokemon sing";
-    const limit = 5;
+    const limit = 10;
     const url = `${GIPHY_SEARCH_ENDPOINT}?api_key=${GIPHY_API_KEY}&q=${encodeURIComponent(query)}&limit=${limit}&rating=g`;
 
     const response = await fetch(url);

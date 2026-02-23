@@ -4,7 +4,7 @@ import GameConfiguration, { type GameSettings } from "./GameConfiguration";
 import MusicQuiz from "./MusicQuiz";
 import { useState, useEffect, useCallback } from "react";
 import { GameDetails } from "./GameDetails";
-import { socket } from "../util/utils";
+import { getRandomGiphy, socket } from "../util/utils";
 import { notifications } from "@mantine/notifications";
 
 export interface RoundResult {
@@ -26,6 +26,7 @@ export function PokemonMusicQuiz() {
   const [volume, setVolume] = useState(currentPlayer?.volume || 50);
   const isHost = currentPlayer?.socketId === gameSettings?.hostSocketId;
   const [phase, setPhase] = useState(gameSettings?.phase || "LOBBY");
+  const [gifUrl, setGifUrl] = useState<string>("");
 
   const startGame = useCallback(
     (settings: GameSettings) => {
@@ -93,6 +94,20 @@ export function PokemonMusicQuiz() {
     };
   }, []);
 
+  // Fetch a random Giphy GIF for waiting (only when in lobby and not host)
+  useEffect(() => {
+    if (phase === "LOBBY" && !isHost) {
+      let cancelled = false;
+      (async () => {
+        const url = await getRandomGiphy("@pokemon sing");
+        if (!cancelled) setGifUrl(url);
+      })();
+      return () => {
+        cancelled = true;
+      };
+    }
+  }, [phase, isHost]);
+
   return (
     <Grid>
       <GridCol
@@ -147,10 +162,7 @@ export function PokemonMusicQuiz() {
               textAlign: "center",
             }}
           >
-            <img
-              style={{ marginBottom: "10px" }}
-              src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExMXpuNGk0MHppc3R4eTY3NTZvejN0enN6aGpmbnZ1YjZybWNybm55ciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ng88DijbQOzq8nPJmv/giphy.gif"
-            />
+            <img style={{ marginBottom: "10px" }} src={gifUrl} />
             Waiting for host to start ...
           </Box>
         )}

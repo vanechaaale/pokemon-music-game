@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { loadYouTubeAPI, parseYouTubeUrl, getRandomPokemonSingGif } from "../util/utils";
+import { loadYouTubeAPI, parseYouTubeUrl, getRandomGiphy } from "../util/utils";
 import { AspectRatio, Box } from "@mantine/core";
 
 interface MusicFrameProps {
@@ -23,10 +23,12 @@ export function MusicFrame(props: MusicFrameProps) {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const url = await getRandomPokemonSingGif();
+      const url = await getRandomGiphy("@pokemon sing");
       if (!cancelled) setGifUrl(url);
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [songLink]);
 
   useEffect(() => {
