@@ -63,6 +63,7 @@ export function GameDetails(props: GameDetailsProps) {
         padding: "1rem",
         boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
         height: "100%",
+        width: "100%",
         display: "flex",
         overflow: "auto",
       }}
@@ -99,7 +100,7 @@ export function GameDetails(props: GameDetailsProps) {
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
-            gap: "1rem",
+            gap: "0.5rem",
             marginBottom: "0.5rem",
           }}
         >

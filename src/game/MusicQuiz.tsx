@@ -5,6 +5,7 @@ import SongMultipleChoice from "./SongMultipleChoice";
 import { socket, deobfuscateSongLink } from "../util/utils";
 import MusicFrame from "./MusicFrame";
 import SongAutocomplete from "./SongAutocomplete";
+import FinalLeaderboard from "./FinalLeaderboard";
 
 const TIME_BETWEEN_ROUNDS = 8;
 
@@ -166,7 +167,7 @@ export function MusicQuiz(props: MusicQuizProps) {
   ]);
 
   useEffect(() => {
-    if (answered || betweenRounds || timeRemaining <= 0 || isGameOver) return;
+    if (betweenRounds || timeRemaining <= 0 || isGameOver) return;
 
     const timer = setInterval(() => {
       setTimeRemaining((prev) => {
@@ -203,7 +204,8 @@ export function MusicQuiz(props: MusicQuizProps) {
 
   return (
     settings.started && (
-      // Forcing the position of this component isn't ideal, but for a game this small I think it's fine
+      // Forcing the position of this component isn't ideal,
+      // but for a game this small I think it's fine...
       <Stack
         style={{
           position: "absolute",
@@ -216,108 +218,94 @@ export function MusicQuiz(props: MusicQuizProps) {
           boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
         }}
       >
-        <Title order={3} mb="md">
-          Round {currentRound} / {settings.numberOfRounds}
-        </Title>
-        <Box
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-            flexDirection: "row",
-          }}
-        >
-          <Box>
-            {isGameOver && (
-              <Box p="lg" bg="blue.1" style={{ marginBottom: "1rem" }}>
-                <Title order={3} ta="center">
-                  Game Over!
-                </Title>
-                <Text ta="center" size="xl" fw={700} mt="sm">
-                  Final Score: {score} / {settings.numberOfRounds}
-                </Text>
-                <Stack gap="xs" mt="md">
-                  {finalScores.map((player, index) => (
-                    <Text key={index} ta="center">
-                      {index + 1}. {player.name}: {player.score}
-                    </Text>
-                  ))}
-                </Stack>
+        {isGameOver ? (
+          <FinalLeaderboard
+            finalScores={finalScores}
+            players={settings.players}
+          />
+        ) : (
+          <>
+            <Title order={3} mb="md">
+              Round {currentRound} / {settings.numberOfRounds}
+            </Title>
+            <Box
+              style={{
+                alignItems: "center",
+                justifyContent: "center",
+                flexDirection: "row",
+              }}
+            >
+              <Box>
+                <MusicFrame
+                  key={videoKey}
+                  songLink={songLink}
+                  difficulty={settings.difficulty}
+                  betweenRounds={betweenRounds}
+                  volume={volume}
+                />
+                <Box style={{ marginTop: "1rem" }}>
+                  <Text size="sm" fw={500} ta="center">
+                    {betweenRounds
+                      ? `Next round in ${timeBetweenRounds}s...`
+                      : `${timeRemaining}s`}
+                  </Text>
+                  <Progress
+                    value={
+                      betweenRounds
+                        ? (timeBetweenRounds / TIME_BETWEEN_ROUNDS) * 100
+                        : (timeRemaining / settings.levelDuration) * 100
+                    }
+                    size="lg"
+                    radius="xl"
+                    color={
+                      betweenRounds
+                        ? "grape"
+                        : timeRemaining <= 5
+                          ? "red"
+                          : timeRemaining <= 10
+                            ? "yellow"
+                            : "blue"
+                    }
+                    style={{ flex: 1 }}
+                    animated={
+                      (!answered && timeRemaining > 0) ||
+                      (betweenRounds && timeBetweenRounds > 0)
+                    }
+                  />
+                </Box>
               </Box>
-            )}
-            <MusicFrame
-              key={videoKey}
-              songLink={songLink}
-              difficulty={settings.difficulty}
-              betweenRounds={betweenRounds}
-              volume={volume}
-            />
-            {!isGameOver && (
-              <Box style={{ marginTop: "1rem" }}>
-                <Text size="sm" fw={500} ta="center">
-                  {betweenRounds
-                    ? `Next round in ${timeBetweenRounds}s...`
-                    : `${timeRemaining}s`}
-                </Text>
-
-                <Progress
-                  value={
-                    betweenRounds
-                      ? (timeBetweenRounds / TIME_BETWEEN_ROUNDS) * 100
-                      : (timeRemaining / settings.levelDuration) * 100
-                  }
-                  size="lg"
-                  radius="xl"
-                  color={
-                    betweenRounds
-                      ? "grape"
-                      : timeRemaining <= 5
-                        ? "red"
-                        : timeRemaining <= 10
-                          ? "yellow"
-                          : "blue"
-                  }
-                  style={{ flex: 1 }}
-                  animated={
-                    (!answered && timeRemaining > 0) ||
-                    (betweenRounds && timeBetweenRounds > 0)
+            </Box>
+            {/* Answer Section */}
+            <Box
+              style={{ width: "100%", height: "100%", position: "relative" }}
+            >
+              {settings.difficulty !== "hard" ? (
+                <SongMultipleChoice
+                  options={multiChoiceOptions}
+                  answered={answered}
+                  answer={answer || ""}
+                  betweenRounds={betweenRounds}
+                  handleAnswer={handleSubmitAnswer}
+                  correctAnswer={
+                    correctAnswer ? formatSongName(correctAnswer) : null
                   }
                 />
-              </Box>
-            )}
-          </Box>
-        </Box>
-        {/* Answer Section */}
-        {!isGameOver && (
-          <Box style={{ width: "100%", height: "100%", position: "relative" }}>
-            <Text fw={500} mb="sm">
-              Guess the song:
-            </Text>
-            {settings.difficulty !== "hard" ? (
-              <SongMultipleChoice
-                options={multiChoiceOptions}
-                answered={answered}
-                answer={answer || ""}
-                betweenRounds={betweenRounds}
-                handleAnswer={handleSubmitAnswer}
-                correctAnswer={
-                  correctAnswer ? formatSongName(correctAnswer) : null
-                }
-              />
-            ) : (
-              <SongAutocomplete
-                value={autocompleteValue}
-                onChange={setAutocompleteValue}
-                onSubmit={handleAutocompleteSubmit}
-                songs={songsList}
-                disabled={answered}
-                betweenRounds={betweenRounds}
-                isCorrect={isCorrect}
-                correctAnswer={
-                  correctAnswer ? formatSongName(correctAnswer) : null
-                }
-              />
-            )}
-          </Box>
+              ) : (
+                <SongAutocomplete
+                  value={autocompleteValue}
+                  onChange={setAutocompleteValue}
+                  onSubmit={handleAutocompleteSubmit}
+                  songs={songsList}
+                  disabled={answered || betweenRounds}
+                  betweenRounds={betweenRounds}
+                  isCorrect={isCorrect}
+                  correctAnswer={
+                    correctAnswer ? formatSongName(correctAnswer) : null
+                  }
+                />
+              )}
+            </Box>
+          </>
         )}
       </Stack>
     )
