@@ -35,10 +35,18 @@ export function PokemonMusicQuiz() {
     [lobbyId],
   );
 
+  const handlePlayAgain = useCallback(() => {
+    socket.emit("playAgain", { code: lobbyId });
+  }, [lobbyId]);
+
   useEffect(() => {
-    // Listen for lobby updates (players joining)
+    // Listen for lobby updates (players joining, or returning to lobby after play again)
     const handleLobbyUpdate = (game: GameSettings) => {
       setGameSettings(game);
+      if (!game.started) {
+        setPhase("LOBBY");
+        setRoundResults([]);
+      }
     };
 
     const handleGameStarted = (game: GameSettings) => {
@@ -108,6 +116,8 @@ export function PokemonMusicQuiz() {
     }
   }, [phase, isHost]);
 
+  console.log("gameSettings.started", gameSettings?.started);
+
   return (
     <Grid>
       <GridCol
@@ -145,7 +155,9 @@ export function PokemonMusicQuiz() {
           <MusicQuiz
             settings={gameSettings}
             volume={volume}
+            isHost={isHost}
             onUpdatePhase={setPhase}
+            onPlayAgain={handlePlayAgain}
           />
         ) : isHost ? (
           <GameConfiguration

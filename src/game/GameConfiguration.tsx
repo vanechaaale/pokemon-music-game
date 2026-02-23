@@ -63,22 +63,30 @@ export function GameConfiguration({
   onStartGame,
 }: GameConfigurationProps) {
   const [difficulty, setDifficulty] = useState<"easy" | "normal" | "hard">(
-    "normal",
+    settings?.difficulty ?? "normal",
   );
-  const [levelDuration, setLevelDuration] = useState(20);
-  const [songTypes, setSongTypes] = useState<SongType[]>([
-    "battle_theme",
-    "location",
-    "route",
-    "action",
-    "theme",
-  ]);
-  const [musicSources, setMusicSources] = useState<MusicSource[]>([
-    "ruby_sapphire",
-    "heartgold_soulsilver",
-    "diamond_pearl",
-  ]);
-  const [numberOfRounds, setNumberOfRounds] = useState(10);
+  const [levelDuration, setLevelDuration] = useState(
+    settings?.levelDuration ?? 20,
+  );
+  const [songTypes, setSongTypes] = useState<SongType[]>(
+    settings?.songTypes ?? [
+      "battle_theme",
+      "location",
+      "route",
+      "action",
+      "theme",
+    ],
+  );
+  const [musicSources, setMusicSources] = useState<MusicSource[]>(
+    settings?.musicSources ?? [
+      "ruby_sapphire",
+      "heartgold_soulsilver",
+      "diamond_pearl",
+    ],
+  );
+  const [numberOfRounds, setNumberOfRounds] = useState(
+    settings?.numberOfRounds ?? 10,
+  );
 
   const startGame = useCallback(() => {
     if (settings) {

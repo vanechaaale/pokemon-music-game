@@ -360,6 +360,44 @@ io.on("connection", (socket) => {
     }
   });
 
+  // Host requests to play again — return to lobby with same settings
+  socket.on("playAgain", ({ code }) => {
+    const game = games.get(code);
+    if (!game) {
+      socket.emit("errorMessage", "Game not found");
+      return;
+    }
+    if (socket.id !== game.hostSocketId) {
+      socket.emit("errorMessage", "Only the host can restart the game");
+      return;
+    }
+
+    // Clear timers
+    if (game.roundTimer) clearTimeout(game.roundTimer);
+    if (game.reviewTimer) clearTimeout(game.reviewTimer);
+
+    // Reset game state but preserve configuration (difficulty, rounds, duration, sources, filters)
+    game.phase = "LOBBY";
+    game.started = false;
+    game.round = 0;
+    game.songs = [];
+    game.usedSongs = [];
+    game.currentSong = null;
+    game.playerAnswers = {};
+    game.playerPointsEarned = {};
+    game.currentOptions = [];
+    game.currentSongList = [];
+    game.roundTimer = null;
+    game.reviewTimer = null;
+
+    // Reset all player scores
+    for (const player of game.players) {
+      player.score = 0;
+    }
+
+    io.to(code).emit("lobbyUpdate", game);
+  });
+
   // Clean up games when a player disconnects
   socket.on("disconnect", () => {
     for (const [code, game] of games.entries()) {

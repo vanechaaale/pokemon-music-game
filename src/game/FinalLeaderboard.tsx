@@ -1,10 +1,12 @@
-import { Box, Stack, Text, Title } from "@mantine/core";
+import { Box, Button, Stack, Text, Title } from "@mantine/core";
 import { useMemo } from "react";
 import type { Player } from "./GameConfiguration";
 
 interface FinalLeaderboardProps {
   finalScores: { name: string; score: number }[];
   players: Player[];
+  isHost: boolean;
+  onPlayAgain: () => void;
 }
 
 interface RankedEntry {
@@ -32,6 +34,8 @@ const PLACE_LABELS: Record<number, string> = {
 export function FinalLeaderboard({
   finalScores,
   players,
+  isHost,
+  onPlayAgain,
 }: FinalLeaderboardProps) {
   // Find the player icon by matching name
   const getIcon = (name: string) => {
@@ -201,6 +205,12 @@ export function FinalLeaderboard({
             </Box>
           ))}
         </Stack>
+      )}
+
+      {isHost && (
+        <Button onClick={onPlayAgain} mt="lg" size="md" variant="filled">
+          Play Again
+        </Button>
       )}
     </Stack>
   );

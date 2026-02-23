@@ -40,11 +40,13 @@ interface GameOverData {
 interface MusicQuizProps {
   settings: GameSettings;
   volume: number;
+  isHost: boolean;
   onUpdatePhase: (newPhase: GameSettings["phase"]) => void;
+  onPlayAgain: () => void;
 }
 
 export function MusicQuiz(props: MusicQuizProps) {
-  const { settings, volume, onUpdatePhase } = props;
+  const { settings, volume, isHost, onUpdatePhase, onPlayAgain } = props;
 
   // Round state from server
   const [currentRound, setCurrentRound] = useState(1);
@@ -213,6 +215,8 @@ export function MusicQuiz(props: MusicQuizProps) {
           <FinalLeaderboard
             finalScores={finalScores}
             players={settings.players}
+            isHost={isHost}
+            onPlayAgain={onPlayAgain}
           />
         ) : (
           <>
