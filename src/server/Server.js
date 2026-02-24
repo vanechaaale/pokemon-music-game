@@ -163,6 +163,13 @@ function isAnswerCorrect(game, answer) {
       (!game.currentSong.game && answer === game.currentSong.title);
 }
 
+function disconnectPlayer(game, socketId) {
+  const playerIndex = game.players.findIndex(p => p.socketId === socketId);
+  if (playerIndex !== -1) {
+    game.players.splice(playerIndex, 1);
+  }
+}
+
 // Host creates a game
 io.on("connection", (socket) => {
   socket.on("createGame", () => {
@@ -213,7 +220,7 @@ io.on("connection", (socket) => {
   socket.on("joinGame", ({ code, name }) => {
     const game = games.get(code);
     if (!game) {
-      socket.emit("errorMessage", "Game not found");
+      socket.emit("message", {severity: "error", description: "Game not found"});
       return;
     }
 
@@ -244,7 +251,7 @@ io.on("connection", (socket) => {
   socket.on("playerEdit", ({ code, player }) => {
     const game = games.get(code);
     if (!game) {
-      socket.emit("errorMessage", "Game not found");
+      socket.emit("message", {severity: "error", description: "Game not found"});
       return;
     }
     const existingPlayerIndex = game.players.findIndex(p => p.socketId === player.socketId);
@@ -258,10 +265,10 @@ io.on("connection", (socket) => {
   socket.on("getLobbyState", (code) => {
     const game = games.get(code);
     if (game) {
-      socket.join(code); // Ensure they're in the room
+      socket.join(code);
       socket.emit("lobbyUpdate", game);
     } else {
-      socket.emit("errorMessage", "Lobby not found");
+      socket.emit("message", {severity: "error", description: "Lobby not found"});
     }
   });
 
@@ -290,12 +297,12 @@ io.on("connection", (socket) => {
   socket.on("startGame", ({ code, settings }) => {
     const game = games.get(code);
     if (!game) {
-      socket.emit("errorMessage", "Game not found");
+      socket.emit("message", {severity: "error", description: "Game not found"});
       return;
     }
 
     if (socket.id !== game.hostSocketId) {
-      socket.emit("errorMessage", "Only the host can start the game");
+      socket.emit("message", {severity: "error", description: "Only the host can start the game"});
       return;
     }
 
@@ -315,11 +322,11 @@ io.on("connection", (socket) => {
     game.songs = loadSongs(settings.musicSources, settings.songTypes);
 
     if (game.songs.length === 0) {
-      socket.emit("errorMessage", "No songs found for selected categories");
+      socket.emit("message", {severity: "error", description: "No songs found for selected categories"});
       return;
     }
     if (game.songs.length < game.numberOfRounds) {
-      socket.emit("errorMessage", `Not enough songs (${game.songs.length}) for selected number of rounds (${game.numberOfRounds})`);
+      socket.emit("message", {severity: "error", description: `Not enough songs (${game.songs.length}) for selected number of rounds (${game.numberOfRounds})`});
       return;
     }
 
@@ -367,11 +374,11 @@ io.on("connection", (socket) => {
   socket.on("playAgain", ({ code }) => {
     const game = games.get(code);
     if (!game) {
-      socket.emit("errorMessage", "Game not found");
+      socket.emit("message", {severity: "error", description: "Game not found"});
       return;
     }
     if (socket.id !== game.hostSocketId) {
-      socket.emit("errorMessage", "Only the host can restart the game");
+      socket.emit("message", {severity: "error", description: "Only the host can restart the game"});
       return;
     }
 
@@ -404,17 +411,30 @@ io.on("connection", (socket) => {
   // Clean up games when a player disconnects
   socket.on("disconnect", () => {
     for (const [code, game] of games.entries()) {
+      // Check if the disconnected socket is the host
       if (game.hostSocketId === socket.id) {
-        if (game.roundTimer) clearTimeout(game.roundTimer);
-        if (game.reviewTimer) clearTimeout(game.reviewTimer);
-        games.delete(code);
+        if (game.players.length === 1) {
+          if (game.roundTimer) clearTimeout(game.roundTimer);
+          if (game.reviewTimer) clearTimeout(game.reviewTimer);
+          games.delete(code);
+        }
+        else {
+          // if there are still players, assign new host after disconnecting the old host
+          const oldHost = game.players.find(p => p.socketId === socket.id).name;
+          const newHost = game.players.find(p => p.socketId !== socket.id);
+          // Disconnect the host
+          disconnectPlayer(game, socket.id);
+          if (newHost) {
+            game.hostSocketId = newHost.socketId;
+            const newHostPlayer = game.players.find(p => p.socketId === newHost.socketId);
+            io.to(code).emit("lobbyUpdate", game);
+            socket.to(code).emit("message", {severity: "info", description: `${oldHost} has disconnected. ${newHostPlayer.name} is the new host.`});
+          }
+        }
       }
         else {
-        const playerIndex = game.players.findIndex(p => p.socketId === socket.id);
-        if (playerIndex !== -1) {
-          game.players.splice(playerIndex, 1);
-          io.to(code).emit("lobbyUpdate", game);
-        }
+        disconnectPlayer(game, socket.id);
+        io.to(code).emit("lobbyUpdate", game);
       }
     }
   });

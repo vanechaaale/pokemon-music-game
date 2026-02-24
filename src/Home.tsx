@@ -27,15 +27,18 @@ export function Home() {
     });
 
     // Listen for error messages
-    socket.on("errorMessage", (message) => {
-      console.log("error:", message);
-    });
+    socket.on(
+      "message",
+      (message: { severity: string; description: string }) => {
+        console.log("error:", message);
+      },
+    );
 
     return () => {
       socket.off("gameCreated");
       socket.off("connect");
       socket.off("connect_error");
-      socket.off("errorMessage");
+      socket.off("message");
     };
   }, [navigate]);
 
@@ -51,14 +54,14 @@ export function Home() {
         .on("joinSuccess", (game) => {
           navigate(`/lobby/${game.code}`);
         })
-        .on("errorMessage", (message) => {
-          console.log("error:", message);
+        .on("message", (message) => {
           notifications.show({
-            title: "Error Joining Lobby",
-            message: message,
+            title:
+              message.severity === "error" ? "Error Joining Lobby" : "Info",
+            message: message.description,
             position: "bottom-center",
             autoClose: 1000,
-            color: "red",
+            color: message.severity === "error" ? "red" : "blue",
           });
         });
     }

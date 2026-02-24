@@ -68,21 +68,24 @@ export function PokemonMusicQuiz() {
   }, [lobbyId]);
 
   useEffect(() => {
-    // listen for error messages
-    const handleErrorMessage = (message: string) => {
+    // listen for messages
+    const handleServerMessage = (message: {
+      severity: string;
+      description: string;
+    }) => {
       notifications.show({
-        title: "Error",
-        message,
+        title: message.severity === "error" ? "Error" : "Info",
+        message: message.description,
         position: "bottom-center",
         autoClose: 3000,
-        color: "red",
+        color: message.severity === "error" ? "red" : "blue",
       });
     };
 
-    socket.on("errorMessage", handleErrorMessage);
+    socket.on("message", handleServerMessage);
 
     return () => {
-      socket.off("errorMessage", handleErrorMessage);
+      socket.off("message", handleServerMessage);
     };
   }, []);
 
