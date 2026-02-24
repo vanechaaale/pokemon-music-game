@@ -29,6 +29,7 @@ export function loadSongs(musicSources, songTypes) {
     diamond_pearl: "../../public/diamond_pearl.json",
     heartgold_soulsilver: "../../public/heartgold_soulsilver.json",
     theme_songs: "../../public/theme_songs.json",
+    black_white: "../../public/black_white.json",
   };
 
   const allSongs = [];

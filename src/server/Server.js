@@ -104,7 +104,7 @@ function endRound(game) {
   // Calculate results for each player
   const results = game.players.map((player) => {
     const answer = game.playerAnswers[player.socketId];
-    const wasCorrect = answer === `${game.currentSong.game}: ${game.currentSong.title}`;
+    const wasCorrect = isAnswerCorrect(game, answer);
     return {
       playerId: player.id,
       name: player.name,
@@ -155,6 +155,12 @@ function endGame(game) {
     finalScores,
     totalRounds: game.numberOfRounds,
   });
+}
+
+function isAnswerCorrect(game, answer) {
+    // Accept either "Game: Title" or just "Title" as correct to account for different answer formats
+  return game.currentSong.game && answer === `${game.currentSong.game}: ${game.currentSong.title}` ||
+      (!game.currentSong.game && answer === game.currentSong.title);
 }
 
 // Host creates a game
@@ -341,14 +347,11 @@ io.on("connection", (socket) => {
     game.playerAnswers[socket.id] = answer;
 
     // Check if correct and update score
-    if (answer === `${game.currentSong.game}: ${game.currentSong.title}`) {
+    if (isAnswerCorrect(game, answer)) {
       const scoreForAnswer = Math.round((timeRemaining / game.levelDuration) * 1000 / 10) * 10;
       game.playerPointsEarned[socket.id] = scoreForAnswer;
       player.score += scoreForAnswer;
     }
-
-    // Notify the player their answer was received
-    // socket.emit("answerReceived", { answer });
 
     // Check if all players have answered
     const allAnswered = game.players.every(

@@ -74,9 +74,9 @@ export function Home() {
         marginTop: "2rem",
       }}
     >
-      <Title> {`Welcome to Pokemon Music Quiz!`}</Title>
+      <Title> {`Welcome to Pokémon Music Quiz!`}</Title>
       <Text>
-        {`Test your knowledge of Pokemon music across all generations. Can you
+        {`Test your knowledge of Pokémon music across all generations. Can you
             name the song from just a few seconds of music?`}
       </Text>
       <Paper p="md" withBorder>

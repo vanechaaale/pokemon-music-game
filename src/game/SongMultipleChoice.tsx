@@ -10,7 +10,7 @@ interface SongMultipleChoiceProps {
   answered: boolean;
   betweenRounds: boolean;
   correctAnswer: string | null;
-  answer: string,
+  answer: string;
   handleAnswer: (answer: string) => void;
 }
 
@@ -19,7 +19,14 @@ function formatSongName(song: SongOption): string {
 }
 
 export default function SongMultipleChoice(props: SongMultipleChoiceProps) {
-  const { options, answered, betweenRounds, correctAnswer, answer, handleAnswer } = props;
+  const {
+    options,
+    answered,
+    betweenRounds,
+    correctAnswer,
+    answer,
+    handleAnswer,
+  } = props;
   return (
     <Stack gap="sm">
       {options.map((option) => {
@@ -28,24 +35,24 @@ export default function SongMultipleChoice(props: SongMultipleChoiceProps) {
           <Button
             key={formattedName}
             variant="outline"
-            onClick={() => { 
-              handleAnswer(formattedName)}}
+            onClick={() => {
+              handleAnswer(formattedName);
+            }}
             disabled={answered || betweenRounds}
             style={{
               fontSize: ".7rem",
               textAlign: "center",
               flexWrap: "wrap",
               backgroundColor: betweenRounds
-                ? answer == formattedName && (formattedName === correctAnswer)
+                ? answer == formattedName && formattedName === correctAnswer
                   ? "#4ed55dff"
-                  : answer == formattedName && (formattedName !== correctAnswer)
-                  ? "#b7414dff"
-                  : (formattedName === correctAnswer)
-                  ? "#aaffb4ff"
-                  : "#ffcbd1ff"
+                  : answer == formattedName && formattedName !== correctAnswer
+                    ? "#b7414dff"
+                    : formattedName === correctAnswer
+                      ? "#aaffb4ff"
+                      : "#ffcbd1ff"
                 : undefined,
               color: answered ? "black" : undefined,
-              
             }}
             fullWidth
           >

@@ -15,7 +15,7 @@ export function Header() {
         onClick={() => navigate("/")}
         fw={500}
       >
-        Pokemon Music Quiz
+        Pokémon Music Quiz
       </Text>
     </AppShell.Header>
   );

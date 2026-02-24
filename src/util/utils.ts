@@ -46,6 +46,7 @@ export const MUSIC_SELECTIONS = [
                   value: "heartgold_soulsilver",
                   label: "HeartGold/SoulSilver",
                 },
+                { value: "black_white", label: "Black/White" },
 ];
 
 export const MusicSource = {
@@ -56,8 +57,9 @@ export const MusicSource = {
   DiamondPearl: 'Diamond/Pearl',
   HeartGoldSoulSilver: 'HeartGold/SoulSilver',
   ThemeSongs: 'Theme Songs',
+  BlackWhite: 'Black/White',
 }
-export type MusicSource = 'red_blue' | 'gold_silver' | 'theme_songs' | 'ruby_sapphire' | 'firered_leafgreen' | 'diamond_pearl' | 'heartgold_soulsilver';
+export type MusicSource = 'red_blue' | 'gold_silver' | 'theme_songs' | 'ruby_sapphire' | 'firered_leafgreen' | 'diamond_pearl' | 'heartgold_soulsilver' | 'black_white';
 
 
 export const SongType = {

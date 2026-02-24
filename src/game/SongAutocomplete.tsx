@@ -41,8 +41,12 @@ export function SongAutocomplete(props: SongAutocompleteProps) {
         placeholder="Type to search for the song..."
         disabled={disabled}
       />
-      <Button onClick={() => onSubmit(value)} disabled={disabled || !value}>
-        Submit Answer
+      <Button
+        onClick={() => onSubmit(value)}
+        disabled={disabled || !value}
+        style={{ alignSelf: "center", width: "40%" }}
+      >
+        Submit
       </Button>
       {betweenRounds && correctAnswer && (
         <Box
