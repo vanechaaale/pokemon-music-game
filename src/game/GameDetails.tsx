@@ -62,10 +62,12 @@ export function GameDetails(props: GameDetailsProps) {
       style={{
         padding: "1rem",
         boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+        borderRadius: "8px",
         height: "100%",
         width: "100%",
         display: "flex",
         overflow: "auto",
+        backgroundColor: "white",
       }}
     >
       <Popover

@@ -56,15 +56,17 @@ export function PokemonMusicQuiz() {
     socket.on("lobbyUpdate", handleLobbyUpdate);
     socket.on("gameStarted", handleGameStarted);
 
-    // Request current lobby state on mount
-    if (lobbyId) {
-      socket.emit("getLobbyState", lobbyId);
-    }
-
     return () => {
       socket.off("lobbyUpdate", handleLobbyUpdate);
       socket.off("gameStarted", handleGameStarted);
     };
+  }, []);
+
+  useEffect(() => {
+    // Request current lobby state on mount
+    if (lobbyId) {
+      socket.emit("getLobbyState", lobbyId);
+    }
   }, [lobbyId]);
 
   useEffect(() => {
@@ -119,10 +121,40 @@ export function PokemonMusicQuiz() {
     }
   }, [phase, isHost]);
 
-  console.log("gameSettings.started", gameSettings?.started);
+  if (!gameSettings) {
+    return (
+      <Box
+        style={{ display: "flex", justifyContent: "center", marginTop: "2rem" }}
+      >
+        Connecting to lobby...
+      </Box>
+    );
+  }
+  // when a user joins an in progress game it breaks
+
+  if (!currentPlayer) {
+    socket.emit("joinGame", {
+      code: lobbyId,
+      name: `Player-${socket.id?.slice(-4)}`,
+    });
+    return (
+      <Box
+        style={{ display: "flex", justifyContent: "center", marginTop: "2rem" }}
+      >
+        Joining lobby...
+      </Box>
+    );
+  }
 
   return (
-    <Grid>
+    <Grid
+      style={{
+        height: "100vh",
+        paddingTop: "3rem",
+        backgroundImage: "url('/container_background.png')",
+        backgroundSize: "cover",
+      }}
+    >
       <GridCol
         span={2}
         style={{
@@ -131,7 +163,6 @@ export function PokemonMusicQuiz() {
           left: 0,
           height: "100%",
           width: "100%",
-          boxSizing: "border-box",
         }}
       >
         <GameDetails

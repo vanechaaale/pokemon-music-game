@@ -11,9 +11,10 @@ export function Header() {
           cursor: "pointer",
           float: "left",
           paddingLeft: "1rem",
+          fontSize: "100%",
         }}
         onClick={() => navigate("/")}
-        fw={500}
+        fw={700}
       >
         Pokémon Music Quiz
       </Text>

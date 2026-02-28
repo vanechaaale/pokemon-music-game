@@ -69,21 +69,16 @@ export function GameConfiguration({
     settings?.levelDuration ?? 20,
   );
   const [songTypes, setSongTypes] = useState<SongType[]>(
-    settings?.songTypes ?? [
-      "battle_theme",
-      "location",
-      "route",
-      "action",
-      "theme",
-    ],
+    settings?.songTypes?.length
+      ? settings.songTypes
+      : ["battle_theme", "location", "route", "action", "theme"],
   );
   const [musicSources, setMusicSources] = useState<MusicSource[]>(
-    settings?.musicSources ?? [
-      "ruby_sapphire",
-      "heartgold_soulsilver",
-      "diamond_pearl",
-    ],
+    settings?.musicSources?.length
+      ? settings.musicSources
+      : ["ruby_sapphire", "heartgold_soulsilver", "diamond_pearl"],
   );
+
   const [numberOfRounds, setNumberOfRounds] = useState(
     settings?.numberOfRounds ?? 10,
   );
@@ -221,7 +216,8 @@ export function GameConfiguration({
               data={MUSIC_SELECTIONS}
               placeholder="Select music sources"
               clearable
-              style={{ maxWidth: "50%" }}
+              style={{ maxWidth: "50%", }}
+              // h={{ base: "200px", lg: "150px", xs: "10px" }}
             />
             <Text mb="xs" style={{ marginTop: "1rem" }}>
               Filters

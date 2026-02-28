@@ -224,6 +224,11 @@ io.on("connection", (socket) => {
       return;
     }
 
+    if (game.started) {
+      socket.emit("message", {severity: "error", description: "Game already in progress"});
+      return;
+    }
+
     // if the player is already in the game, allow them to rejoin (e.g. after a refresh) without creating a new player entry
     if (game.players.some(p => p.socketId === socket.id)) {
       socket.emit("joinSuccess", game);

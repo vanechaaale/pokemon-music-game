@@ -73,32 +73,59 @@ export function Home() {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
+        justifyContent: "center",
         gap: "1rem",
-        marginTop: "2rem",
+
+        backgroundImage: "url('/container_background.png')",
+        backgroundSize: "auto auto",
+        height: "100vh",
+        width: "100%",
       }}
     >
-      <Title> {`Welcome to Pokémon Music Quiz!`}</Title>
-      <Text>
-        {`Test your knowledge of Pokémon music across all generations. Can you
+      <Box
+        w={{ base: "95%", sm: "80%", md: "40%" }}
+        style={{
+          padding: "2rem",
+          borderRadius: "8px",
+          border: "2px solid #ccc",
+          backgroundColor: "white",
+        }}
+      >
+        <Box visibleFrom="xs">
+          <Title> {`Welcome to Pokémon Music Quiz!`}</Title>
+          <Text>
+            {`Test your knowledge of Pokémon music across all generations. Can you
             name the song from just a few seconds of music?`}
-      </Text>
-      <Paper p="md" withBorder>
-        <TextInput
-          label="Lobby ID"
-          placeholder="Enter Lobby ID (e.g. ABCD)"
-          value={gameCode}
-          onChange={(e) => setGameCode(e.currentTarget.value)}
-          style={{ marginBottom: "1rem" }}
-        />
-        <Button
-          onClick={handleJoinLobby}
-          disabled={!gameCode.trim()}
-          style={{ marginRight: "1rem" }}
+          </Text>
+        </Box>
+        <Paper
+          w={{ base: "50%", sm: "80%", xs: "100%" }}
+          p="md"
+          withBorder
+          style={{ margin: "1rem auto" }}
         >
-          Join Lobby
+          <TextInput
+            label="Lobby ID"
+            placeholder="Enter Lobby ID (e.g. ABCD)"
+            value={gameCode}
+            onChange={(e) => setGameCode(e.currentTarget.value)}
+            style={{ marginBottom: "1rem" }}
+          />
+          <Button
+            onClick={handleJoinLobby}
+            disabled={!gameCode.trim()}
+            style={{ marginRight: "1rem" }}
+          >
+            Join Lobby
+          </Button>
+        </Paper>
+        <Button
+          onClick={createGame}
+          style={{ display: "block", margin: "0 auto" }}
+        >
+          New Lobby
         </Button>
-        <Button onClick={createGame}>New Lobby</Button>
-      </Paper>
+      </Box>
     </Box>
   );
 }

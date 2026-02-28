@@ -8,13 +8,7 @@ import { Header } from "./Header";
 function App() {
   return (
     <BrowserRouter>
-      <AppShell
-        styles={{
-          main: {
-            paddingTop: "3rem",
-          },
-        }}
-      >
+      <AppShell>
         <Header />
         <AppShell.Main>
           <Notifications />
